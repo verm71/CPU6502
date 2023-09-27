@@ -33,15 +33,15 @@ namespace CPU6502
 
         public byte Read(ulong addr)
         {
-            if (addr >= 0xa000 && addr <= 0xbfff && (mem[0] & 0x1) != 0)
+            if (addr >= 0xa000 && addr <= 0xbfff && (mem[1] & 0x1) != 0)
             {
                 return BASICROM[addr - 0xa000]; // return BASIC ROM
             }
-            else if (addr >= 0xe000 && addr <= 0xffff && (mem[0] & 0x2) != 0)
+            else if (addr >= 0xe000 && addr <= 0xffff && (mem[1] & 0x2) != 0)
             {
                 return KERNALROM[addr - 0xe000]; // return KERNAL ROM
             }
-            else if (addr >= 0xd000 && addr <= 0xdfff && (mem[0] & 0x4) != 0)
+            else if (addr >= 0xd000 && addr <= 0xdfff && (mem[1] & 0x4) != 0)
             {
                 return CHARROM[addr - 0xd000];
             }
