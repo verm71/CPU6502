@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _6502
+namespace CPU6502
 {
     internal class CPU
     {
