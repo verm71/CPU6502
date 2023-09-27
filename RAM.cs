@@ -13,10 +13,10 @@ namespace CPU6502
         private byte[] mem = new byte[65536];
         private byte[] BASICROM = new byte[0xc000 - 0xa000];
         static readonly string BASICROM_FILENAME = "ROMS\\basic";
-        
+
         private byte[] KERNALROM = new byte[0x10000 - 0xe000];
         static readonly string KERNALROM_FILENAME = "ROMS\\kernal";
-        
+
         private byte[] CHARROM = new byte[0xe000 - 0xd000];
         static readonly string CHARROM_FILENAME = "ROMS\\chargen";
 
@@ -24,11 +24,11 @@ namespace CPU6502
         {
             // Setup I/O and mapping registers
             mem[0] = 0xff;
-            mem[1] = 0x07;
+            mem[1] = 0x1f;
 
             BASICROM = File.ReadAllBytes(BASICROM_FILENAME);
-            KERNALROM=File.ReadAllBytes(KERNALROM_FILENAME);
-            CHARROM=File.ReadAllBytes(CHARROM_FILENAME);
+            KERNALROM = File.ReadAllBytes(KERNALROM_FILENAME);
+            CHARROM = File.ReadAllBytes(CHARROM_FILENAME);
         }
 
         public byte Read(ulong addr)
@@ -50,6 +50,9 @@ namespace CPU6502
                 return mem[addr];
             }
         }
+
+        public void Write(ulong addr, byte value)
+        { mem[addr] = value; }
 
     }
 }
