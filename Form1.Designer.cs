@@ -52,7 +52,25 @@
             btnLoad = new Button();
             label2 = new Label();
             openFileDialog1 = new OpenFileDialog();
-            panel1 = new Panel();
+            pnlDump = new Panel();
+            vScrollBar1 = new VScrollBar();
+            lbl0F = new Label();
+            lbl0E = new Label();
+            lbl0D = new Label();
+            lbl0C = new Label();
+            lbl0B = new Label();
+            lbl0A = new Label();
+            lbl09 = new Label();
+            lbl08 = new Label();
+            lbl07 = new Label();
+            lbl06 = new Label();
+            lbl05 = new Label();
+            lbl04 = new Label();
+            lbl03 = new Label();
+            lbl02 = new Label();
+            lbl01 = new Label();
+            lbl00 = new Label();
+            pnlDump.SuspendLayout();
             SuspendLayout();
             // 
             // button1
@@ -66,7 +84,7 @@
             button1.TabIndex = 0;
             button1.Text = "STEP";
             button1.UseVisualStyleBackColor = false;
-            button1.Click += button1_Click;
+            button1.Click += btnStep_Click;
             // 
             // label1
             // 
@@ -262,6 +280,7 @@
             lblPC.Name = "lblPC";
             lblPC.Size = new Size(70, 23);
             lblPC.TabIndex = 19;
+            lblPC.Leave += lblPC_Leave;
             // 
             // SetPC
             // 
@@ -309,19 +328,205 @@
             // 
             openFileDialog1.FileName = "openFileDialog1";
             // 
-            // panel1
+            // pnlDump
             // 
-            panel1.Location = new Point(42, 95);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(354, 140);
-            panel1.TabIndex = 24;
+            pnlDump.Controls.Add(vScrollBar1);
+            pnlDump.Controls.Add(lbl0F);
+            pnlDump.Controls.Add(lbl0E);
+            pnlDump.Controls.Add(lbl0D);
+            pnlDump.Controls.Add(lbl0C);
+            pnlDump.Controls.Add(lbl0B);
+            pnlDump.Controls.Add(lbl0A);
+            pnlDump.Controls.Add(lbl09);
+            pnlDump.Controls.Add(lbl08);
+            pnlDump.Controls.Add(lbl07);
+            pnlDump.Controls.Add(lbl06);
+            pnlDump.Controls.Add(lbl05);
+            pnlDump.Controls.Add(lbl04);
+            pnlDump.Controls.Add(lbl03);
+            pnlDump.Controls.Add(lbl02);
+            pnlDump.Controls.Add(lbl01);
+            pnlDump.Controls.Add(lbl00);
+            pnlDump.Location = new Point(42, 94);
+            pnlDump.Name = "pnlDump";
+            pnlDump.Size = new Size(516, 245);
+            pnlDump.TabIndex = 24;
+            // 
+            // vScrollBar1
+            // 
+            vScrollBar1.Location = new Point(0, 23);
+            vScrollBar1.Maximum = 4097;
+            vScrollBar1.Name = "vScrollBar1";
+            vScrollBar1.Size = new Size(27, 183);
+            vScrollBar1.TabIndex = 16;
+            vScrollBar1.ValueChanged += vScrollBar1_ValueChanged;
+            // 
+            // lbl0F
+            // 
+            lbl0F.AutoSize = true;
+            lbl0F.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl0F.Location = new Point(442, 10);
+            lbl0F.Name = "lbl0F";
+            lbl0F.Size = new Size(20, 15);
+            lbl0F.TabIndex = 15;
+            lbl0F.Text = "0F";
+            // 
+            // lbl0E
+            // 
+            lbl0E.AutoSize = true;
+            lbl0E.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl0E.Location = new Point(417, 10);
+            lbl0E.Name = "lbl0E";
+            lbl0E.Size = new Size(20, 15);
+            lbl0E.TabIndex = 14;
+            lbl0E.Text = "0E";
+            // 
+            // lbl0D
+            // 
+            lbl0D.AutoSize = true;
+            lbl0D.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl0D.Location = new Point(392, 10);
+            lbl0D.Name = "lbl0D";
+            lbl0D.Size = new Size(23, 15);
+            lbl0D.TabIndex = 13;
+            lbl0D.Text = "0D";
+            // 
+            // lbl0C
+            // 
+            lbl0C.AutoSize = true;
+            lbl0C.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl0C.Location = new Point(367, 10);
+            lbl0C.Name = "lbl0C";
+            lbl0C.Size = new Size(21, 15);
+            lbl0C.TabIndex = 12;
+            lbl0C.Text = "0C";
+            // 
+            // lbl0B
+            // 
+            lbl0B.AutoSize = true;
+            lbl0B.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl0B.Location = new Point(342, 10);
+            lbl0B.Name = "lbl0B";
+            lbl0B.Size = new Size(22, 15);
+            lbl0B.TabIndex = 11;
+            lbl0B.Text = "0B";
+            // 
+            // lbl0A
+            // 
+            lbl0A.AutoSize = true;
+            lbl0A.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl0A.Location = new Point(317, 10);
+            lbl0A.Name = "lbl0A";
+            lbl0A.Size = new Size(22, 15);
+            lbl0A.TabIndex = 10;
+            lbl0A.Text = "0A";
+            // 
+            // lbl09
+            // 
+            lbl09.AutoSize = true;
+            lbl09.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl09.Location = new Point(292, 10);
+            lbl09.Name = "lbl09";
+            lbl09.Size = new Size(21, 15);
+            lbl09.TabIndex = 9;
+            lbl09.Text = "09";
+            // 
+            // lbl08
+            // 
+            lbl08.AutoSize = true;
+            lbl08.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl08.Location = new Point(267, 10);
+            lbl08.Name = "lbl08";
+            lbl08.Size = new Size(21, 15);
+            lbl08.TabIndex = 8;
+            lbl08.Text = "08";
+            // 
+            // lbl07
+            // 
+            lbl07.AutoSize = true;
+            lbl07.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl07.Location = new Point(242, 10);
+            lbl07.Name = "lbl07";
+            lbl07.Size = new Size(21, 15);
+            lbl07.TabIndex = 7;
+            lbl07.Text = "07";
+            // 
+            // lbl06
+            // 
+            lbl06.AutoSize = true;
+            lbl06.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl06.Location = new Point(217, 10);
+            lbl06.Name = "lbl06";
+            lbl06.Size = new Size(21, 15);
+            lbl06.TabIndex = 6;
+            lbl06.Text = "06";
+            // 
+            // lbl05
+            // 
+            lbl05.AutoSize = true;
+            lbl05.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl05.Location = new Point(192, 10);
+            lbl05.Name = "lbl05";
+            lbl05.Size = new Size(21, 15);
+            lbl05.TabIndex = 5;
+            lbl05.Text = "05";
+            // 
+            // lbl04
+            // 
+            lbl04.AutoSize = true;
+            lbl04.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl04.Location = new Point(167, 10);
+            lbl04.Name = "lbl04";
+            lbl04.Size = new Size(21, 15);
+            lbl04.TabIndex = 4;
+            lbl04.Text = "04";
+            // 
+            // lbl03
+            // 
+            lbl03.AutoSize = true;
+            lbl03.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl03.Location = new Point(142, 10);
+            lbl03.Name = "lbl03";
+            lbl03.Size = new Size(21, 15);
+            lbl03.TabIndex = 3;
+            lbl03.Text = "03";
+            // 
+            // lbl02
+            // 
+            lbl02.AutoSize = true;
+            lbl02.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl02.Location = new Point(117, 10);
+            lbl02.Name = "lbl02";
+            lbl02.Size = new Size(21, 15);
+            lbl02.TabIndex = 2;
+            lbl02.Text = "02";
+            // 
+            // lbl01
+            // 
+            lbl01.AutoSize = true;
+            lbl01.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl01.Location = new Point(92, 10);
+            lbl01.Name = "lbl01";
+            lbl01.Size = new Size(21, 15);
+            lbl01.TabIndex = 1;
+            lbl01.Text = "01";
+            // 
+            // lbl00
+            // 
+            lbl00.AutoSize = true;
+            lbl00.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lbl00.Location = new Point(67, 10);
+            lbl00.Name = "lbl00";
+            lbl00.Size = new Size(21, 15);
+            lbl00.TabIndex = 0;
+            lbl00.Text = "00";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(688, 351);
-            Controls.Add(panel1);
+            Controls.Add(pnlDump);
             Controls.Add(label2);
             Controls.Add(btnLoad);
             Controls.Add(txtLoadAt);
@@ -348,6 +553,8 @@
             Margin = new Padding(2, 1, 2, 1);
             Name = "Form1";
             Text = "Form1";
+            pnlDump.ResumeLayout(false);
+            pnlDump.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -378,6 +585,23 @@
         private Button btnLoad;
         private Label label2;
         private OpenFileDialog openFileDialog1;
-        private Panel panel1;
+        private Panel pnlDump;
+        private Label lbl01;
+        private Label lbl00;
+        private Label lbl0F;
+        private Label lbl0E;
+        private Label lbl0D;
+        private Label lbl0C;
+        private Label lbl0B;
+        private Label lbl0A;
+        private Label lbl09;
+        private Label lbl08;
+        private Label lbl07;
+        private Label lbl06;
+        private Label lbl05;
+        private Label lbl04;
+        private Label lbl03;
+        private Label lbl02;
+        private VScrollBar vScrollBar1;
     }
 }

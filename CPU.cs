@@ -124,7 +124,7 @@ namespace CPU6502
 
                 case LDA_ABS_X:
                     {
-                        ushort addr = (ushort)(mem.Read(PC++) | (mem.Read(PC++) << 8) + X + (F.C ? 1 : 0));
+                        ushort addr = (ushort)((mem.Read(PC++) + X) | (mem.Read(PC++) << 8));
                         A = mem.Read(addr);
                         F.Z = (A == 0);
                         F.N = (A & 0x80) != 0;
@@ -134,7 +134,7 @@ namespace CPU6502
 
                 case CMP_ABS_X:
                     {
-                        byte operand = mem.Read((ushort)(mem.Read(PC++) | (mem.Read(PC++) << 8) + X + (F.C ? 1 : 0)));
+                        byte operand = mem.Read((ushort)((mem.Read(PC++) + X) | (mem.Read(PC++) << 8)));
                         sbyte result = (sbyte)(A - operand);
                         if (result == 0)
                         {
@@ -230,14 +230,14 @@ namespace CPU6502
                 case LDA_ABS_X:
                     {
                         ushort operand = (ushort)(mem.Read((ushort)(addr + 1)) | (mem.Read((ushort)(addr + 2)) << 8));
-                        Assembler = string.Format("LDA ${0:X4}+X+C  ${1:X4}", operand, operand + X + (ushort)(F.C ? 1 : 0));
+                        Assembler = string.Format("LDA ${0:X4}+X  ${1:X4}", operand, operand + X);
                         break;
                     }
 
                 case CMP_ABS_X:
                     {
                         ushort operand = (ushort)(mem.Read((ushort)(addr + 1)) | (mem.Read((ushort)(addr + 2)) << 8));
-                        Assembler = string.Format("CMP ${0:X4}+X+C  ${1:X4}", operand, operand + X + (ushort)(F.C ? 1 : 0));
+                        Assembler = string.Format("CMP ${0:X4}+X  ${1:X4}", operand, operand + X);
                         break;
                     }
 
@@ -257,7 +257,7 @@ namespace CPU6502
 
                 case STX_ABS:
                     {
-                        ushort operand=(ushort)(mem.Read((ushort)(addr+1)) | (mem.Read((ushort)(addr+2))<<8));
+                        ushort operand = (ushort)(mem.Read((ushort)(addr + 1)) | (mem.Read((ushort)(addr + 2)) << 8));
                         Assembler = string.Format("STX ${0:X4}", operand);
                         break;
                     }
