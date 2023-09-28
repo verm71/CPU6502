@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace CPU6502
 {
     public partial class Form1 : Form
@@ -55,6 +57,46 @@ namespace CPU6502
             cpu.Execute();
 
             UpdateStatusDisplay();
+        }
+
+        private void SetPC_Click(object sender, EventArgs e)
+        {
+            string working = lblPC.Text;
+
+            if (working.StartsWith("0x"))
+            {
+                working = working.Substring(1);
+            }
+
+            ushort value = ushort.Parse(working, NumberStyles.HexNumber);
+            cpu.PC = value;
+
+            UpdateStatusDisplay();
+        }
+
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+            string LoadAt = txtLoadAt.Text;
+            if (LoadAt.StartsWith("0x"))
+            {
+                LoadAt = LoadAt.Substring(1);
+            }
+
+            ushort value = ushort.Parse(LoadAt, NumberStyles.HexNumber);
+
+            byte[] file;
+
+            if (openFileDialog1.ShowDialog(this) == DialogResult.OK)
+            {
+                file = File.ReadAllBytes(openFileDialog1.FileName);
+
+                for (int i = 0; i < file.Length; i++)
+                {
+                    mem.Write((ushort)(value + i), file[i]);
+                }
+
+                mem.Write(1, 0); // no mapping of ROM. All RAM available.
+            }
         }
     }
 }

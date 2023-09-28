@@ -30,7 +30,6 @@
         {
             button1 = new Button();
             label1 = new Label();
-            lblPC = new Label();
             lblSP = new Label();
             label3 = new Label();
             lblN = new Label();
@@ -47,17 +46,26 @@
             lblA = new Label();
             label14 = new Label();
             lblOpCode = new Label();
+            lblPC = new TextBox();
+            SetPC = new Button();
+            txtLoadAt = new TextBox();
+            btnLoad = new Button();
+            label2 = new Label();
+            openFileDialog1 = new OpenFileDialog();
+            panel1 = new Panel();
             SuspendLayout();
             // 
             // button1
             // 
+            button1.BackColor = Color.FromArgb(192, 255, 192);
+            button1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             button1.Location = new Point(6, 6);
             button1.Margin = new Padding(2, 1, 2, 1);
             button1.Name = "button1";
             button1.Size = new Size(101, 30);
             button1.TabIndex = 0;
             button1.Text = "STEP";
-            button1.UseVisualStyleBackColor = true;
+            button1.UseVisualStyleBackColor = false;
             button1.Click += button1_Click;
             // 
             // label1
@@ -70,24 +78,12 @@
             label1.TabIndex = 1;
             label1.Text = "PC:";
             // 
-            // lblPC
-            // 
-            lblPC.AutoSize = true;
-            lblPC.BorderStyle = BorderStyle.FixedSingle;
-            lblPC.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblPC.Location = new Point(139, 13);
-            lblPC.Margin = new Padding(2, 0, 2, 0);
-            lblPC.Name = "lblPC";
-            lblPC.Size = new Size(51, 17);
-            lblPC.TabIndex = 2;
-            lblPC.Text = "0x0000";
-            // 
             // lblSP
             // 
             lblSP.AutoSize = true;
             lblSP.BorderStyle = BorderStyle.FixedSingle;
             lblSP.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblSP.Location = new Point(399, 13);
+            lblSP.Location = new Point(331, 35);
             lblSP.Margin = new Padding(2, 0, 2, 0);
             lblSP.Name = "lblSP";
             lblSP.Size = new Size(35, 17);
@@ -97,7 +93,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(314, 13);
+            label3.Location = new Point(246, 35);
             label3.Margin = new Padding(2, 0, 2, 0);
             label3.Name = "label3";
             label3.Size = new Size(73, 15);
@@ -108,7 +104,7 @@
             // 
             lblN.AutoSize = true;
             lblN.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblN.Location = new Point(483, 13);
+            lblN.Location = new Point(486, 13);
             lblN.Margin = new Padding(2, 0, 2, 0);
             lblN.Name = "lblN";
             lblN.Size = new Size(16, 15);
@@ -119,7 +115,7 @@
             // 
             lblO.AutoSize = true;
             lblO.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblO.Location = new Point(504, 13);
+            lblO.Location = new Point(507, 13);
             lblO.Margin = new Padding(2, 0, 2, 0);
             lblO.Name = "lblO";
             lblO.Size = new Size(16, 15);
@@ -130,7 +126,7 @@
             // 
             lblC.AutoSize = true;
             lblC.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblC.Location = new Point(598, 13);
+            lblC.Location = new Point(601, 13);
             lblC.Margin = new Padding(2, 0, 2, 0);
             lblC.Name = "lblC";
             lblC.Size = new Size(14, 15);
@@ -141,7 +137,7 @@
             // 
             lblZ.AutoSize = true;
             lblZ.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblZ.Location = new Point(579, 13);
+            lblZ.Location = new Point(581, 13);
             lblZ.Margin = new Padding(2, 0, 2, 0);
             lblZ.Name = "lblZ";
             lblZ.Size = new Size(14, 15);
@@ -152,7 +148,7 @@
             // 
             lblI.AutoSize = true;
             lblI.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblI.Location = new Point(564, 13);
+            lblI.Location = new Point(566, 13);
             lblI.Margin = new Padding(2, 0, 2, 0);
             lblI.Name = "lblI";
             lblI.Size = new Size(11, 15);
@@ -163,7 +159,7 @@
             // 
             lblD.AutoSize = true;
             lblD.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblD.Location = new Point(544, 13);
+            lblD.Location = new Point(546, 13);
             lblD.Margin = new Padding(2, 0, 2, 0);
             lblD.Name = "lblD";
             lblD.Size = new Size(16, 15);
@@ -174,7 +170,7 @@
             // 
             lblB.AutoSize = true;
             lblB.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblB.Location = new Point(525, 13);
+            lblB.Location = new Point(528, 13);
             lblB.Margin = new Padding(2, 0, 2, 0);
             lblB.Name = "lblB";
             lblB.Size = new Size(15, 15);
@@ -252,18 +248,85 @@
             lblOpCode.AutoSize = true;
             lblOpCode.BorderStyle = BorderStyle.FixedSingle;
             lblOpCode.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblOpCode.Location = new Point(208, 14);
+            lblOpCode.Location = new Point(246, 14);
             lblOpCode.Margin = new Padding(2, 0, 2, 0);
             lblOpCode.Name = "lblOpCode";
             lblOpCode.Size = new Size(77, 17);
             lblOpCode.TabIndex = 18;
             lblOpCode.Text = "JMP 0x1234";
             // 
+            // lblPC
+            // 
+            lblPC.Location = new Point(136, 12);
+            lblPC.Margin = new Padding(2, 1, 2, 1);
+            lblPC.Name = "lblPC";
+            lblPC.Size = new Size(70, 23);
+            lblPC.TabIndex = 19;
+            // 
+            // SetPC
+            // 
+            SetPC.BackColor = Color.FromArgb(192, 255, 192);
+            SetPC.Location = new Point(207, 10);
+            SetPC.Margin = new Padding(2, 1, 2, 1);
+            SetPC.Name = "SetPC";
+            SetPC.Size = new Size(35, 23);
+            SetPC.TabIndex = 20;
+            SetPC.Text = "Set";
+            SetPC.UseVisualStyleBackColor = false;
+            SetPC.Click += SetPC_Click;
+            // 
+            // txtLoadAt
+            // 
+            txtLoadAt.Location = new Point(488, 44);
+            txtLoadAt.Margin = new Padding(2, 1, 2, 1);
+            txtLoadAt.Name = "txtLoadAt";
+            txtLoadAt.Size = new Size(70, 23);
+            txtLoadAt.TabIndex = 21;
+            // 
+            // btnLoad
+            // 
+            btnLoad.BackColor = Color.FromArgb(192, 255, 192);
+            btnLoad.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            btnLoad.Location = new Point(403, 39);
+            btnLoad.Margin = new Padding(2, 1, 2, 1);
+            btnLoad.Name = "btnLoad";
+            btnLoad.Size = new Size(57, 30);
+            btnLoad.TabIndex = 22;
+            btnLoad.Text = "Load...";
+            btnLoad.UseVisualStyleBackColor = false;
+            btnLoad.Click += btnLoad_Click;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(465, 47);
+            label2.Name = "label2";
+            label2.Size = new Size(17, 15);
+            label2.TabIndex = 23;
+            label2.Text = "at";
+            // 
+            // openFileDialog1
+            // 
+            openFileDialog1.FileName = "openFileDialog1";
+            // 
+            // panel1
+            // 
+            panel1.Location = new Point(42, 95);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(354, 140);
+            panel1.TabIndex = 24;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(688, 351);
+            Controls.Add(panel1);
+            Controls.Add(label2);
+            Controls.Add(btnLoad);
+            Controls.Add(txtLoadAt);
+            Controls.Add(SetPC);
+            Controls.Add(lblPC);
             Controls.Add(lblOpCode);
             Controls.Add(lblA);
             Controls.Add(label14);
@@ -280,7 +343,6 @@
             Controls.Add(lblN);
             Controls.Add(lblSP);
             Controls.Add(label3);
-            Controls.Add(lblPC);
             Controls.Add(label1);
             Controls.Add(button1);
             Margin = new Padding(2, 1, 2, 1);
@@ -294,7 +356,6 @@
 
         private Button button1;
         private Label label1;
-        private Label lblPC;
         private Label lblSP;
         private Label label3;
         private Label lblN;
@@ -311,5 +372,12 @@
         private Label lblA;
         private Label label14;
         private Label lblOpCode;
+        private TextBox lblPC;
+        private Button SetPC;
+        private TextBox txtLoadAt;
+        private Button btnLoad;
+        private Label label2;
+        private OpenFileDialog openFileDialog1;
+        private Panel panel1;
     }
 }

@@ -46,6 +46,7 @@ namespace CPU6502
         const byte JSR = 0X20;
         const byte RTS = 0x60;
         const byte SEI = 0x78;
+        const byte STX_ABS = 0x8E;
         const byte TXS = 0x9A;
         const byte LDX_IMM = 0XA2;
         const byte LDA_ABS_X = 0xBD;
@@ -158,8 +159,8 @@ namespace CPU6502
                     }
 
                 case BNE_REL:
-                    {                      
-                        ushort target = (ushort)(PC+1 + (short)mem.Read((ushort)(PC++)));
+                    {
+                        ushort target = (ushort)(PC + 1 + (short)mem.Read((ushort)(PC++)));
 
                         if (!F.Z)
                         {
@@ -172,6 +173,13 @@ namespace CPU6502
                 case RTS:
                     {
                         PC = (ushort)(Pop() | (Pop() << 8));
+                        break;
+                    }
+
+                case STX_ABS:
+                    {
+                        ushort addr = (ushort)(mem.Read(PC++) | (mem.Read(PC++) << 8));
+                        mem.Write(addr, X);
                         break;
                     }
 
@@ -215,21 +223,21 @@ namespace CPU6502
 
                 case JSR:
                     {
-                        Assembler = String.Format("JSR {0:X4}", mem.Read((ushort)(addr + 1)) | (mem.Read((ushort)(addr + 2)) << 8));
+                        Assembler = String.Format("JSR ${0:X4}", mem.Read((ushort)(addr + 1)) | (mem.Read((ushort)(addr + 2)) << 8));
                         break;
                     }
 
                 case LDA_ABS_X:
                     {
                         ushort operand = (ushort)(mem.Read((ushort)(addr + 1)) | (mem.Read((ushort)(addr + 2)) << 8));
-                        Assembler = string.Format("LDA {0:X4}+X+C  {1:X4}", operand, operand + X + (ushort)(F.C ? 1 : 0));
+                        Assembler = string.Format("LDA ${0:X4}+X+C  ${1:X4}", operand, operand + X + (ushort)(F.C ? 1 : 0));
                         break;
                     }
 
                 case CMP_ABS_X:
                     {
-                        ushort operand = (ushort)(mem.Read((ushort)(addr+1)) | (mem.Read((ushort)(addr+2)) << 8));
-                        Assembler = string.Format("CMP {0:X4}+X+C  {1:X4}", operand, operand + X + (ushort)(F.C ? 1 : 0));
+                        ushort operand = (ushort)(mem.Read((ushort)(addr + 1)) | (mem.Read((ushort)(addr + 2)) << 8));
+                        Assembler = string.Format("CMP ${0:X4}+X+C  ${1:X4}", operand, operand + X + (ushort)(F.C ? 1 : 0));
                         break;
                     }
 
@@ -237,13 +245,20 @@ namespace CPU6502
                 case BNE_REL:
                     {
                         sbyte rel = (sbyte)mem.Read((ushort)(addr + 1));
-                        Assembler = String.Format("BNE {0:X4}", addr+2+rel);
+                        Assembler = String.Format("BNE {0:X4}", addr + 2 + rel);
                         break;
                     }
 
                 case RTS:
                     {
                         Assembler = "RTS";
+                        break;
+                    }
+
+                case STX_ABS:
+                    {
+                        ushort operand=(ushort)(mem.Read((ushort)(addr+1)) | (mem.Read((ushort)(addr+2))<<8));
+                        Assembler = string.Format("STX ${0:X4}", operand);
                         break;
                     }
 
