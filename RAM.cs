@@ -31,7 +31,7 @@ namespace CPU6502
             CHARROM = File.ReadAllBytes(CHARROM_FILENAME);
         }
 
-        public byte Read(ulong addr)
+        public byte Read(ushort addr)
         {
             if (addr >= 0xa000 && addr <= 0xbfff && (mem[1] & 0x1) != 0)
             {
@@ -51,7 +51,7 @@ namespace CPU6502
             }
         }
 
-        public void Write(ulong addr, byte value)
+        public void Write(ushort addr, byte value)
         { mem[addr] = value; }
 
     }

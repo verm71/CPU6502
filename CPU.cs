@@ -35,7 +35,7 @@ namespace CPU6502
     internal class CPU
     {
         public byte A, X, Y, SP;
-        public ulong PC;
+        public ushort PC;
         public Flags F = new Flags();
         RAM mem;
         byte OpCode;
@@ -44,10 +44,12 @@ namespace CPU6502
 
         // *************************************************
         const byte JSR = 0X20;
+        const byte RTS = 0x60;
         const byte SEI = 0x78;
         const byte TXS = 0x9A;
         const byte LDX_IMM = 0XA2;
         const byte LDA_ABS_X = 0xBD;
+        const byte BNE_REL = 0xD0;
         const byte CLD = 0xD8;
         const byte CMP_ABS_X = 0xDD;
         // *************************************************
@@ -61,7 +63,7 @@ namespace CPU6502
         public void Reset()
         {
             F.Reset();
-            PC = (ulong)(mem.Read(0xfffc) + (mem.Read(0xfffd) << 8));
+            PC = (ushort)(mem.Read(0xfffc) + (mem.Read(0xfffd) << 8));
         }
 
         public void Fetch()
@@ -72,7 +74,12 @@ namespace CPU6502
 
         public void Push(byte b)
         {
-            mem.Write((ulong)(0x0100 + SP--), b);
+            mem.Write((ushort)(0x0100 + SP--), b);
+        }
+
+        public byte Pop()
+        {
+            return (mem.Read((ushort)(0x0100 + (++SP))));
         }
 
         public void Execute()
@@ -110,13 +117,13 @@ namespace CPU6502
                     {
                         Push((byte)(((PC + 2) & 0xFF00) >> 8));
                         Push((byte)(((PC + 2) & 0x00FF)));
-                        PC = (ulong)(mem.Read(PC++) | (mem.Read(PC++) << 8));
+                        PC = (ushort)(mem.Read(PC++) | (mem.Read(PC++) << 8));
                         break;
                     }
 
                 case LDA_ABS_X:
                     {
-                        ulong addr = (ulong)(mem.Read(PC++) | (mem.Read(PC++) << 8) + X + (F.C?1:0)) ;
+                        ushort addr = (ushort)(mem.Read(PC++) | (mem.Read(PC++) << 8) + X + (F.C ? 1 : 0));
                         A = mem.Read(addr);
                         F.Z = (A == 0);
                         F.N = (A & 0x80) != 0;
@@ -126,21 +133,47 @@ namespace CPU6502
 
                 case CMP_ABS_X:
                     {
-                        ulong addr = (ulong)(mem.Read(PC++) | (mem.Read(PC++) << 8) + X + (F.C ? 1 : 0));
-                        byte operand=mem.Read(addr);
-                        short result = (short)(A - operand);
-                        if (result==0)
+                        byte operand = mem.Read((ushort)(mem.Read(PC++) | (mem.Read(PC++) << 8) + X + (F.C ? 1 : 0)));
+                        sbyte result = (sbyte)(A - operand);
+                        if (result == 0)
                         {
                             F.N = false;
-                            F.C = false;
+                            F.C = true;
                             F.Z = true;
-                        } else if (result < 0)
+                        }
+                        else if (result < 0)
                         {
                             F.N = true;
-
+                            F.C = false;
+                            F.Z = false;
                         }
+                        else
+                        {
+                            F.N = false;
+                            F.C = true;
+                            F.Z = false;
+                        }
+
+                        break;
                     }
 
+                case BNE_REL:
+                    {                      
+                        ushort target = (ushort)(PC+1 + (short)mem.Read((ushort)(PC++)));
+
+                        if (!F.Z)
+                        {
+                            PC = target;
+                        }
+
+                        break;
+                    }
+
+                case RTS:
+                    {
+                        PC = (ushort)(Pop() | (Pop() << 8));
+                        break;
+                    }
 
                 default:
                     {
@@ -149,16 +182,16 @@ namespace CPU6502
             }
         }
 
-        public string Disassemble(ulong addr)
+        public string Disassemble(ushort addr)
         {
             byte OpCode = mem.Read(addr);
-            string Assembler = String.Format("??? {0:X2} {1:X2}", OpCode, mem.Read(addr + 1));
+            string Assembler = String.Format("??? {0:X2} {1:X2}", OpCode, mem.Read((ushort)(addr + 1)));
 
             switch (OpCode)
             {
                 case LDX_IMM:
                     {
-                        Assembler = String.Format("LDX #{0:X2}", mem.Read(addr + 1));
+                        Assembler = String.Format("LDX #{0:X2}", mem.Read((ushort)(addr + 1)));
                         break;
                     }
 
@@ -182,21 +215,38 @@ namespace CPU6502
 
                 case JSR:
                     {
-                        Assembler = String.Format("JSR {0:X4}", mem.Read(addr + 1) | (mem.Read(addr + 2) << 8));
+                        Assembler = String.Format("JSR {0:X4}", mem.Read((ushort)(addr + 1)) | (mem.Read((ushort)(addr + 2)) << 8));
                         break;
                     }
 
                 case LDA_ABS_X:
                     {
-                        ulong operand = (ulong)(mem.Read(addr + 1) | (mem.Read(addr + 2) << 8));
-                        Assembler = string.Format("LDA {0:X4}+X+C  {1:X4}", operand, operand + X + (ulong)(F.C?1:0)));
+                        ushort operand = (ushort)(mem.Read((ushort)(addr + 1)) | (mem.Read((ushort)(addr + 2)) << 8));
+                        Assembler = string.Format("LDA {0:X4}+X+C  {1:X4}", operand, operand + X + (ushort)(F.C ? 1 : 0));
                         break;
                     }
 
                 case CMP_ABS_X:
                     {
-
+                        ushort operand = (ushort)(mem.Read((ushort)(addr+1)) | (mem.Read((ushort)(addr+2)) << 8));
+                        Assembler = string.Format("CMP {0:X4}+X+C  {1:X4}", operand, operand + X + (ushort)(F.C ? 1 : 0));
+                        break;
                     }
+
+
+                case BNE_REL:
+                    {
+                        sbyte rel = (sbyte)mem.Read((ushort)(addr + 1));
+                        Assembler = String.Format("BNE {0:X4}", addr+2+rel);
+                        break;
+                    }
+
+                case RTS:
+                    {
+                        Assembler = "RTS";
+                        break;
+                    }
+
             }
 
             return Assembler;
