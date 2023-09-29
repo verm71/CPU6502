@@ -46,14 +46,19 @@ namespace CPU6502
         const byte JSR = 0X20;
         const byte RTS = 0x60;
         const byte SEI = 0x78;
+        const byte STA_ZP = 0x85;
+        const byte STA_ABS = 0x8D;
         const byte STX_ABS = 0x8E;
         const byte TXS = 0x9A;
         const byte LDX_IMM = 0XA2;
+        const byte LDA_IMM = 0xA9;
+        const byte LDA_ABS = 0xAD;
         const byte LDA_ABS_X = 0xBD;
         const byte DEX = 0xCA;
         const byte BNE_REL = 0xD0;
         const byte CLD = 0xD8;
         const byte CMP_ABS_X = 0xDD;
+        const byte BEQ_REL = 0xF0;
         // *************************************************
 
         public CPU(RAM m)
@@ -188,8 +193,52 @@ namespace CPU6502
                     {
                         X--;
                         F.Z = (X == 0);
-                        F.N = ((X & 0x80) !=0);
-                        
+                        F.N = ((X & 0x80) != 0);
+
+                        break;
+                    }
+
+                case LDA_IMM:
+                    {
+                        A = mem.Read(PC++);
+                        Cycles += 2;
+                        this.F.Z = (A == 0);
+                        this.F.N = (A & 0x80) != 0;
+                        break;
+                    }
+
+                case STA_ABS:
+                    {
+                        ushort addr = (ushort)(mem.Read(PC++) | (mem.Read(PC++) << 8));
+                        mem.Write(addr, A);
+                        break;
+                    }
+
+                case STA_ZP:
+                    {
+                        byte zp = mem.Read(PC++);
+                        mem.Write(zp, A);
+                        break;
+                    }
+
+                case LDA_ABS:
+                    {
+                        ushort addr = (ushort)(mem.Read(PC++) | (mem.Read(PC++) << 8));
+                        A = mem.Read(addr);
+                        F.Z = (A == 0);
+                        F.N = (A & 0x80) != 0;
+                        break;
+                    }
+
+                case BEQ_REL:
+                    {
+                        ushort target = (ushort)(PC + 1 + (sbyte)mem.Read((ushort)(PC)));
+                        PC++;
+                        if (F.Z)
+                        {
+                            PC = target;
+                        }
+
                         break;
                     }
 
@@ -251,7 +300,6 @@ namespace CPU6502
                         break;
                     }
 
-
                 case BNE_REL:
                     {
                         sbyte rel = (sbyte)mem.Read((ushort)(addr + 1));
@@ -277,6 +325,43 @@ namespace CPU6502
                         Assembler = "DEX";
                         break;
                     }
+
+                case LDA_IMM:
+                    {
+                        byte operand = mem.Read((ushort)(addr + 1));
+                        Assembler = string.Format("LDA #{0:X2}", operand);
+                        break;
+                    }
+
+                case STA_ABS:
+                    {
+                        ushort operand = (ushort)(mem.Read((ushort)(addr + 1)) | (mem.Read((ushort)(addr + 2)) << 8));
+                        Assembler = string.Format("STA ${0:X4}", operand);
+                        break;
+                    }
+
+                case STA_ZP:
+                    {
+                        byte zp = mem.Read((ushort)(addr + 1));
+                        Assembler = string.Format("STA ${0:X2}", zp);
+                        break;
+                    }
+
+                case LDA_ABS:
+                    {
+                        ushort operand = (ushort)(mem.Read((ushort)(addr + 1)) | (mem.Read((ushort)(addr + 2)) << 8));
+                        Assembler = string.Format("LDA ${0:X4}", operand);
+                        break;
+                    }
+
+                case BEQ_REL:
+                    {
+                        sbyte rel = (sbyte)mem.Read((ushort)(addr + 1));
+                        Assembler = String.Format("BEQ {0:X4}", addr + 2 + rel);
+                        break;
+                    }
+
+
             }
 
             return Assembler;
