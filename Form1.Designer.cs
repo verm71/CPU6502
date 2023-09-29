@@ -77,6 +77,7 @@
             saveFileDialog1 = new SaveFileDialog();
             btnReset = new Button();
             cbUseHeader = new CheckBox();
+            btnRun = new Button();
             pnlDump.SuspendLayout();
             SuspendLayout();
             // 
@@ -355,7 +356,7 @@
             pnlDump.Controls.Add(lbl01);
             pnlDump.Controls.Add(lbl00);
             pnlDump.Location = new Point(78, 201);
-            pnlDump.Margin = new Padding(6, 6, 6, 6);
+            pnlDump.Margin = new Padding(6);
             pnlDump.Name = "pnlDump";
             pnlDump.Size = new Size(898, 523);
             pnlDump.TabIndex = 24;
@@ -610,11 +611,25 @@
             cbUseHeader.UseVisualStyleBackColor = true;
             cbUseHeader.CheckedChanged += cbUseHeader_CheckedChanged;
             // 
+            // btnRun
+            // 
+            btnRun.BackColor = Color.FromArgb(192, 255, 192);
+            btnRun.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            btnRun.Location = new Point(11, 85);
+            btnRun.Margin = new Padding(4, 2, 4, 2);
+            btnRun.Name = "btnRun";
+            btnRun.Size = new Size(188, 64);
+            btnRun.TabIndex = 31;
+            btnRun.Text = "RUN";
+            btnRun.UseVisualStyleBackColor = false;
+            btnRun.Click += btnRun_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1416, 749);
+            Controls.Add(btnRun);
             Controls.Add(cbUseHeader);
             Controls.Add(btnReset);
             Controls.Add(btnSave);
@@ -705,5 +720,6 @@
         private SaveFileDialog saveFileDialog1;
         private Button btnReset;
         private CheckBox cbUseHeader;
+        private Button btnRun;
     }
 }

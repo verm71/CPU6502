@@ -40,6 +40,7 @@ namespace CPU6502
         RAM mem;
         byte OpCode;
         ulong Cycles = 0;
+        public bool run = false;
 
 
         // *************************************************
@@ -366,6 +367,15 @@ namespace CPU6502
 
             return Assembler;
 
+        }
+
+        public void Run()
+        {
+            while(run)
+            {
+                Fetch();
+                Execute();
+            }
         }
     }
 }

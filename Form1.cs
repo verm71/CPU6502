@@ -301,5 +301,11 @@ namespace CPU6502
         {
             txtLoadAt.Enabled = !cbUseHeader.Checked;
         }
+
+        private void btnRun_Click(object sender, EventArgs e)
+        {
+            cpu.run = true;
+            BeginInvoke(cpu.Run);
+        }
     }
 }
