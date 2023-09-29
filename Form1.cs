@@ -223,22 +223,34 @@ namespace CPU6502
         private void btnLoad_Click(object sender, EventArgs e)
         {
             string LoadAt = txtLoadAt.Text;
-            if (LoadAt.StartsWith("0x"))
-            {
-                LoadAt = LoadAt.Substring(1);
-            }
+            ushort value = 0;
 
-            ushort value = ushort.Parse(LoadAt, NumberStyles.HexNumber);
+            if (!cbUseHeader.Checked)
+            {
+                if (LoadAt.StartsWith("0x"))
+                {
+                    LoadAt = LoadAt.Substring(1);
+                }
+
+                value = ushort.Parse(LoadAt, NumberStyles.HexNumber);
+            }
 
             byte[] file;
 
             if (openFileDialog1.ShowDialog(this) == DialogResult.OK)
             {
                 file = File.ReadAllBytes(openFileDialog1.FileName);
+                int startRead = 0;
 
-                for (int i = 0; i < file.Length; i++)
+                if (cbUseHeader.Checked)
                 {
-                    mem.Write((ushort)(value + i), file[i]);
+                    value = (ushort)(file[0] + (file[1] << 8));
+                    startRead = 2;
+                }
+
+                for (int i = startRead; i < file.Length; i++)
+                {
+                    mem.Write((ushort)(value + i - startRead), file[i]);
                 }
 
                 UpdateDump();
@@ -283,6 +295,11 @@ namespace CPU6502
             cpu.Reset();
             UpdateStatusDisplay();
             UpdateDump();
+        }
+
+        private void cbUseHeader_CheckedChanged(object sender, EventArgs e)
+        {
+            txtLoadAt.Enabled = !cbUseHeader.Checked;
         }
     }
 }

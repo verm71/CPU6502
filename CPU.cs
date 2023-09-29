@@ -252,7 +252,7 @@ namespace CPU6502
         public string Disassemble(ushort addr)
         {
             byte OpCode = mem.Read(addr);
-            string Assembler = String.Format("??? {0:X2} {1:X2}", OpCode, mem.Read((ushort)(addr + 1)));
+            string Assembler = String.Format("??? {0:X2} {1:X2} {2:X2}", OpCode, mem.Read((ushort)(addr + 1)),mem.Read((ushort)(addr+2)));
 
             switch (OpCode)
             {
