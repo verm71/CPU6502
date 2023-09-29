@@ -50,6 +50,7 @@ namespace CPU6502
         const byte TXS = 0x9A;
         const byte LDX_IMM = 0XA2;
         const byte LDA_ABS_X = 0xBD;
+        const byte DEX = 0xCA;
         const byte BNE_REL = 0xD0;
         const byte CLD = 0xD8;
         const byte CMP_ABS_X = 0xDD;
@@ -160,8 +161,8 @@ namespace CPU6502
 
                 case BNE_REL:
                     {
-                        ushort target = (ushort)(PC + 1 + (short)mem.Read((ushort)(PC++)));
-
+                        ushort target = (ushort)(PC + 1 + (sbyte)mem.Read((ushort)(PC)));
+                        PC++;
                         if (!F.Z)
                         {
                             PC = target;
@@ -180,6 +181,15 @@ namespace CPU6502
                     {
                         ushort addr = (ushort)(mem.Read(PC++) | (mem.Read(PC++) << 8));
                         mem.Write(addr, X);
+                        break;
+                    }
+
+                case DEX:
+                    {
+                        X--;
+                        F.Z = (X == 0);
+                        F.N = ((X & 0x80) !=0);
+                        
                         break;
                     }
 
@@ -262,6 +272,11 @@ namespace CPU6502
                         break;
                     }
 
+                case DEX:
+                    {
+                        Assembler = "DEX";
+                        break;
+                    }
             }
 
             return Assembler;

@@ -70,6 +70,12 @@
             lbl02 = new Label();
             lbl01 = new Label();
             lbl00 = new Label();
+            txtSaveTo = new TextBox();
+            txtSaveFrom = new TextBox();
+            label4 = new Label();
+            btnSave = new Button();
+            saveFileDialog1 = new SaveFileDialog();
+            btnReset = new Button();
             pnlDump.SuspendLayout();
             SuspendLayout();
             // 
@@ -280,7 +286,6 @@
             lblPC.Name = "lblPC";
             lblPC.Size = new Size(70, 23);
             lblPC.TabIndex = 19;
-            lblPC.Leave += lblPC_Leave;
             // 
             // SetPC
             // 
@@ -296,7 +301,7 @@
             // 
             // txtLoadAt
             // 
-            txtLoadAt.Location = new Point(488, 44);
+            txtLoadAt.Location = new Point(488, 37);
             txtLoadAt.Margin = new Padding(2, 1, 2, 1);
             txtLoadAt.Name = "txtLoadAt";
             txtLoadAt.Size = new Size(70, 23);
@@ -306,7 +311,7 @@
             // 
             btnLoad.BackColor = Color.FromArgb(192, 255, 192);
             btnLoad.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            btnLoad.Location = new Point(403, 39);
+            btnLoad.Location = new Point(403, 32);
             btnLoad.Margin = new Padding(2, 1, 2, 1);
             btnLoad.Name = "btnLoad";
             btnLoad.Size = new Size(57, 30);
@@ -318,7 +323,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(465, 47);
+            label2.Location = new Point(465, 40);
             label2.Name = "label2";
             label2.Size = new Size(17, 15);
             label2.TabIndex = 23;
@@ -521,11 +526,69 @@
             lbl00.TabIndex = 0;
             lbl00.Text = "00";
             // 
+            // txtSaveTo
+            // 
+            txtSaveTo.Location = new Point(586, 69);
+            txtSaveTo.Margin = new Padding(2, 1, 2, 1);
+            txtSaveTo.Name = "txtSaveTo";
+            txtSaveTo.Size = new Size(70, 23);
+            txtSaveTo.TabIndex = 25;
+            txtSaveTo.Text = "0xFFFF";
+            // 
+            // txtSaveFrom
+            // 
+            txtSaveFrom.Location = new Point(488, 69);
+            txtSaveFrom.Margin = new Padding(2, 1, 2, 1);
+            txtSaveFrom.Name = "txtSaveFrom";
+            txtSaveFrom.Size = new Size(70, 23);
+            txtSaveFrom.TabIndex = 26;
+            txtSaveFrom.Text = "0x0000";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(563, 72);
+            label4.Name = "label4";
+            label4.Size = new Size(18, 15);
+            label4.TabIndex = 27;
+            label4.Text = "to";
+            // 
+            // btnSave
+            // 
+            btnSave.BackColor = Color.FromArgb(192, 255, 192);
+            btnSave.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            btnSave.Location = new Point(403, 64);
+            btnSave.Margin = new Padding(2, 1, 2, 1);
+            btnSave.Name = "btnSave";
+            btnSave.Size = new Size(57, 30);
+            btnSave.TabIndex = 28;
+            btnSave.Text = "Save...";
+            btnSave.UseVisualStyleBackColor = false;
+            btnSave.Click += btnSave_Click;
+            // 
+            // btnReset
+            // 
+            btnReset.BackColor = Color.FromArgb(255, 192, 192);
+            btnReset.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            btnReset.Location = new Point(403, 0);
+            btnReset.Margin = new Padding(2, 1, 2, 1);
+            btnReset.Name = "btnReset";
+            btnReset.Size = new Size(57, 30);
+            btnReset.TabIndex = 29;
+            btnReset.Text = "RESET";
+            btnReset.UseVisualStyleBackColor = false;
+            btnReset.Click += btnReset_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(688, 351);
+            Controls.Add(btnReset);
+            Controls.Add(btnSave);
+            Controls.Add(label4);
+            Controls.Add(txtSaveFrom);
+            Controls.Add(txtSaveTo);
             Controls.Add(pnlDump);
             Controls.Add(label2);
             Controls.Add(btnLoad);
@@ -603,5 +666,11 @@
         private Label lbl03;
         private Label lbl02;
         private VScrollBar vScrollBar1;
+        private TextBox txtSaveTo;
+        private TextBox txtSaveFrom;
+        private Label label4;
+        private Button btnSave;
+        private SaveFileDialog saveFileDialog1;
+        private Button btnReset;
     }
 }

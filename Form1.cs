@@ -91,23 +91,23 @@ namespace CPU6502
 
             if (addr >= dumpStart + 0x80)
             {
-                 newDumpStart = (ushort)(addr & 0xfff0);
+                newDumpStart = (ushort)(addr & 0xfff0);
                 //  will that value cause us to display > 0xFFFF ?
                 if (newDumpStart > (0xfff0 - 0x0080))
                 {
                     newDumpStart = 0xfff0 - 0x0080;
                 }
                 //dumpStart = newDumpStart;
-                
+
                 //UpdateDump();
             }
             else if (addr < dumpStart)
             {
-                 newDumpStart = (ushort)(addr & 0xfff0);
-                
+                newDumpStart = (ushort)(addr & 0xfff0);
+
             }
 
-            vScrollBar1.Value = newDumpStart/0x10;
+            vScrollBar1.Value = newDumpStart / 0x10;
 
             int x, y;
             y = ((addr & 0xfff0) - newDumpStart) / 0x10;
@@ -241,7 +241,7 @@ namespace CPU6502
                     mem.Write((ushort)(value + i), file[i]);
                 }
 
-                mem.Write(1, 0); // no mapping of ROM. All RAM available.
+                UpdateDump();
             }
         }
 
@@ -251,9 +251,38 @@ namespace CPU6502
             UpdateDump();
         }
 
-        private void lblPC_Leave(object sender, EventArgs e)
+        private void btnSave_Click(object sender, EventArgs e)
         {
+            if (saveFileDialog1.ShowDialog(this) == DialogResult.OK)
+            {
+                if (txtSaveFrom.Text.ToString().StartsWith("0x"))
+                {
+                    txtSaveFrom.Text = txtSaveFrom.Text.Substring(2);
+                }
 
+                if (txtSaveTo.Text.ToString().StartsWith("0x"))
+                {
+                    txtSaveTo.Text = txtSaveTo.Text.Substring(2);
+                }
+
+                ushort begin = ushort.Parse(txtSaveFrom.Text, NumberStyles.HexNumber);
+                ushort end = ushort.Parse(txtSaveTo.Text, NumberStyles.HexNumber);
+
+                byte[] buf = new byte[end - begin + 1];
+                for (int i = 0; i < buf.Length; i++)
+                {
+                    buf[i] = mem.Read((ushort)(begin + i));
+                }
+
+                File.WriteAllBytes(saveFileDialog1.FileName, buf);
+            }
+        }
+
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            cpu.Reset();
+            UpdateStatusDisplay();
+            UpdateDump();
         }
     }
 }
