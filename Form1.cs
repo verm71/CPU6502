@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 
 namespace CPU6502
@@ -9,6 +10,7 @@ namespace CPU6502
         Label[,] dump;
         Label[] addr;
         ushort dumpStart;
+        Task CPUTask = null;
 
         public Form1()
         {
@@ -304,8 +306,27 @@ namespace CPU6502
 
         private void btnRun_Click(object sender, EventArgs e)
         {
-            cpu.run = true;
-            BeginInvoke(cpu.Run);
+            if (!cpu.run)
+            {
+                cpu.run = true;
+                CPUTask = Task.Run(cpu.Run);
+                UpdateTimer.Enabled = true;
+            }
+        }
+
+        private void UpdateTimer_Tick(object sender, EventArgs e)
+        {
+            UpdateStatusDisplay();
+
+            if (!cpu.run && (CPUTask != null))
+            {
+                if (CPUTask.IsCompleted)
+                {
+                    CPUTask.Dispose();
+                    Debug.WriteLine("CPU Thread stopped.");
+                    UpdateTimer.Enabled = false;
+                };
+            }
         }
     }
 }

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             button1 = new Button();
             label1 = new Label();
             lblSP = new Label();
@@ -78,6 +79,7 @@
             btnReset = new Button();
             cbUseHeader = new CheckBox();
             btnRun = new Button();
+            UpdateTimer = new System.Windows.Forms.Timer(components);
             pnlDump.SuspendLayout();
             SuspendLayout();
             // 
@@ -85,10 +87,10 @@
             // 
             button1.BackColor = Color.FromArgb(192, 255, 192);
             button1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            button1.Location = new Point(11, 13);
-            button1.Margin = new Padding(4, 2, 4, 2);
+            button1.Location = new Point(6, 6);
+            button1.Margin = new Padding(2, 1, 2, 1);
             button1.Name = "button1";
-            button1.Size = new Size(188, 64);
+            button1.Size = new Size(101, 30);
             button1.TabIndex = 0;
             button1.Text = "STEP";
             button1.UseVisualStyleBackColor = false;
@@ -97,10 +99,10 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(206, 28);
-            label1.Margin = new Padding(4, 0, 4, 0);
+            label1.Location = new Point(111, 13);
+            label1.Margin = new Padding(2, 0, 2, 0);
             label1.Name = "label1";
-            label1.Size = new Size(47, 32);
+            label1.Size = new Size(25, 15);
             label1.TabIndex = 1;
             label1.Text = "PC:";
             // 
@@ -109,20 +111,20 @@
             lblSP.AutoSize = true;
             lblSP.BorderStyle = BorderStyle.FixedSingle;
             lblSP.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblSP.Location = new Point(615, 75);
-            lblSP.Margin = new Padding(4, 0, 4, 0);
+            lblSP.Location = new Point(331, 35);
+            lblSP.Margin = new Padding(2, 0, 2, 0);
             lblSP.Name = "lblSP";
-            lblSP.Size = new Size(67, 34);
+            lblSP.Size = new Size(35, 17);
             lblSP.TabIndex = 4;
             lblSP.Text = "0xFF";
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(457, 75);
-            label3.Margin = new Padding(4, 0, 4, 0);
+            label3.Location = new Point(246, 35);
+            label3.Margin = new Padding(2, 0, 2, 0);
             label3.Name = "label3";
-            label3.Size = new Size(151, 32);
+            label3.Size = new Size(73, 15);
             label3.TabIndex = 3;
             label3.Text = "SP: 0x0100 +";
             // 
@@ -130,10 +132,10 @@
             // 
             lblN.AutoSize = true;
             lblN.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblN.Location = new Point(903, 28);
-            lblN.Margin = new Padding(4, 0, 4, 0);
+            lblN.Location = new Point(486, 13);
+            lblN.Margin = new Padding(2, 0, 2, 0);
             lblN.Name = "lblN";
-            lblN.Size = new Size(33, 32);
+            lblN.Size = new Size(16, 15);
             lblN.TabIndex = 5;
             lblN.Text = "N";
             // 
@@ -141,10 +143,10 @@
             // 
             lblO.AutoSize = true;
             lblO.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblO.Location = new Point(942, 28);
-            lblO.Margin = new Padding(4, 0, 4, 0);
+            lblO.Location = new Point(507, 13);
+            lblO.Margin = new Padding(2, 0, 2, 0);
             lblO.Name = "lblO";
-            lblO.Size = new Size(32, 32);
+            lblO.Size = new Size(16, 15);
             lblO.TabIndex = 6;
             lblO.Text = "O";
             // 
@@ -152,10 +154,10 @@
             // 
             lblC.AutoSize = true;
             lblC.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblC.Location = new Point(1116, 28);
-            lblC.Margin = new Padding(4, 0, 4, 0);
+            lblC.Location = new Point(601, 13);
+            lblC.Margin = new Padding(2, 0, 2, 0);
             lblC.Name = "lblC";
-            lblC.Size = new Size(29, 32);
+            lblC.Size = new Size(14, 15);
             lblC.TabIndex = 7;
             lblC.Text = "C";
             // 
@@ -163,10 +165,10 @@
             // 
             lblZ.AutoSize = true;
             lblZ.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblZ.Location = new Point(1079, 28);
-            lblZ.Margin = new Padding(4, 0, 4, 0);
+            lblZ.Location = new Point(581, 13);
+            lblZ.Margin = new Padding(2, 0, 2, 0);
             lblZ.Name = "lblZ";
-            lblZ.Size = new Size(29, 32);
+            lblZ.Size = new Size(14, 15);
             lblZ.TabIndex = 8;
             lblZ.Text = "Z";
             // 
@@ -174,10 +176,10 @@
             // 
             lblI.AutoSize = true;
             lblI.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblI.Location = new Point(1051, 28);
-            lblI.Margin = new Padding(4, 0, 4, 0);
+            lblI.Location = new Point(566, 13);
+            lblI.Margin = new Padding(2, 0, 2, 0);
             lblI.Name = "lblI";
-            lblI.Size = new Size(22, 32);
+            lblI.Size = new Size(11, 15);
             lblI.TabIndex = 9;
             lblI.Text = "I";
             // 
@@ -185,10 +187,10 @@
             // 
             lblD.AutoSize = true;
             lblD.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblD.Location = new Point(1014, 28);
-            lblD.Margin = new Padding(4, 0, 4, 0);
+            lblD.Location = new Point(546, 13);
+            lblD.Margin = new Padding(2, 0, 2, 0);
             lblD.Name = "lblD";
-            lblD.Size = new Size(32, 32);
+            lblD.Size = new Size(16, 15);
             lblD.TabIndex = 10;
             lblD.Text = "D";
             // 
@@ -196,10 +198,10 @@
             // 
             lblB.AutoSize = true;
             lblB.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblB.Location = new Point(981, 28);
-            lblB.Margin = new Padding(4, 0, 4, 0);
+            lblB.Location = new Point(528, 13);
+            lblB.Margin = new Padding(2, 0, 2, 0);
             lblB.Name = "lblB";
-            lblB.Size = new Size(29, 32);
+            lblB.Size = new Size(15, 15);
             lblB.TabIndex = 11;
             lblB.Text = "B";
             // 
@@ -208,20 +210,20 @@
             lblY.AutoSize = true;
             lblY.BorderStyle = BorderStyle.FixedSingle;
             lblY.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblY.Location = new Point(405, 115);
-            lblY.Margin = new Padding(4, 0, 4, 0);
+            lblY.Location = new Point(218, 54);
+            lblY.Margin = new Padding(2, 0, 2, 0);
             lblY.Name = "lblY";
-            lblY.Size = new Size(71, 34);
+            lblY.Size = new Size(37, 17);
             lblY.TabIndex = 13;
             lblY.Text = "0x00";
             // 
             // label10
             // 
             label10.AutoSize = true;
-            label10.Location = new Point(368, 115);
-            label10.Margin = new Padding(4, 0, 4, 0);
+            label10.Location = new Point(198, 54);
+            label10.Margin = new Padding(2, 0, 2, 0);
             label10.Name = "label10";
-            label10.Size = new Size(32, 32);
+            label10.Size = new Size(17, 15);
             label10.TabIndex = 12;
             label10.Text = "Y:";
             // 
@@ -230,20 +232,20 @@
             lblX.AutoSize = true;
             lblX.BorderStyle = BorderStyle.FixedSingle;
             lblX.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblX.Location = new Point(258, 115);
-            lblX.Margin = new Padding(4, 0, 4, 0);
+            lblX.Location = new Point(139, 54);
+            lblX.Margin = new Padding(2, 0, 2, 0);
             lblX.Name = "lblX";
-            lblX.Size = new Size(71, 34);
+            lblX.Size = new Size(37, 17);
             lblX.TabIndex = 15;
             lblX.Text = "0x00";
             // 
             // label12
             // 
             label12.AutoSize = true;
-            label12.Location = new Point(206, 115);
-            label12.Margin = new Padding(4, 0, 4, 0);
+            label12.Location = new Point(111, 54);
+            label12.Margin = new Padding(2, 0, 2, 0);
             label12.Name = "label12";
-            label12.Size = new Size(33, 32);
+            label12.Size = new Size(17, 15);
             label12.TabIndex = 14;
             label12.Text = "X:";
             // 
@@ -252,20 +254,20 @@
             lblA.AutoSize = true;
             lblA.BorderStyle = BorderStyle.FixedSingle;
             lblA.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblA.Location = new Point(258, 75);
-            lblA.Margin = new Padding(4, 0, 4, 0);
+            lblA.Location = new Point(139, 35);
+            lblA.Margin = new Padding(2, 0, 2, 0);
             lblA.Name = "lblA";
-            lblA.Size = new Size(71, 34);
+            lblA.Size = new Size(37, 17);
             lblA.TabIndex = 17;
             lblA.Text = "0x00";
             // 
             // label14
             // 
             label14.AutoSize = true;
-            label14.Location = new Point(206, 75);
-            label14.Margin = new Padding(4, 0, 4, 0);
+            label14.Location = new Point(111, 35);
+            label14.Margin = new Padding(2, 0, 2, 0);
             label14.Name = "label14";
-            label14.Size = new Size(45, 32);
+            label14.Size = new Size(24, 15);
             label14.TabIndex = 16;
             label14.Text = "Ac:";
             // 
@@ -274,28 +276,28 @@
             lblOpCode.AutoSize = true;
             lblOpCode.BorderStyle = BorderStyle.FixedSingle;
             lblOpCode.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblOpCode.Location = new Point(457, 30);
-            lblOpCode.Margin = new Padding(4, 0, 4, 0);
+            lblOpCode.Location = new Point(246, 14);
+            lblOpCode.Margin = new Padding(2, 0, 2, 0);
             lblOpCode.Name = "lblOpCode";
-            lblOpCode.Size = new Size(155, 34);
+            lblOpCode.Size = new Size(77, 17);
             lblOpCode.TabIndex = 18;
             lblOpCode.Text = "JMP 0x1234";
             // 
             // lblPC
             // 
-            lblPC.Location = new Point(253, 26);
-            lblPC.Margin = new Padding(4, 2, 4, 2);
+            lblPC.Location = new Point(136, 12);
+            lblPC.Margin = new Padding(2, 1, 2, 1);
             lblPC.Name = "lblPC";
-            lblPC.Size = new Size(127, 39);
+            lblPC.Size = new Size(70, 23);
             lblPC.TabIndex = 19;
             // 
             // SetPC
             // 
             SetPC.BackColor = Color.FromArgb(192, 255, 192);
-            SetPC.Location = new Point(384, 21);
-            SetPC.Margin = new Padding(4, 2, 4, 2);
+            SetPC.Location = new Point(207, 10);
+            SetPC.Margin = new Padding(2, 1, 2, 1);
             SetPC.Name = "SetPC";
-            SetPC.Size = new Size(65, 49);
+            SetPC.Size = new Size(35, 23);
             SetPC.TabIndex = 20;
             SetPC.Text = "Set";
             SetPC.UseVisualStyleBackColor = false;
@@ -303,20 +305,20 @@
             // 
             // txtLoadAt
             // 
-            txtLoadAt.Location = new Point(906, 79);
-            txtLoadAt.Margin = new Padding(4, 2, 4, 2);
+            txtLoadAt.Location = new Point(488, 37);
+            txtLoadAt.Margin = new Padding(2, 1, 2, 1);
             txtLoadAt.Name = "txtLoadAt";
-            txtLoadAt.Size = new Size(127, 39);
+            txtLoadAt.Size = new Size(70, 23);
             txtLoadAt.TabIndex = 21;
             // 
             // btnLoad
             // 
             btnLoad.BackColor = Color.FromArgb(192, 255, 192);
             btnLoad.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            btnLoad.Location = new Point(748, 68);
-            btnLoad.Margin = new Padding(4, 2, 4, 2);
+            btnLoad.Location = new Point(403, 32);
+            btnLoad.Margin = new Padding(2, 1, 2, 1);
             btnLoad.Name = "btnLoad";
-            btnLoad.Size = new Size(106, 64);
+            btnLoad.Size = new Size(57, 30);
             btnLoad.TabIndex = 22;
             btnLoad.Text = "Load...";
             btnLoad.UseVisualStyleBackColor = false;
@@ -325,10 +327,9 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(864, 85);
-            label2.Margin = new Padding(6, 0, 6, 0);
+            label2.Location = new Point(465, 40);
             label2.Name = "label2";
-            label2.Size = new Size(34, 32);
+            label2.Size = new Size(17, 15);
             label2.TabIndex = 23;
             label2.Text = "at";
             // 
@@ -355,18 +356,17 @@
             pnlDump.Controls.Add(lbl02);
             pnlDump.Controls.Add(lbl01);
             pnlDump.Controls.Add(lbl00);
-            pnlDump.Location = new Point(78, 201);
-            pnlDump.Margin = new Padding(6);
+            pnlDump.Location = new Point(42, 94);
             pnlDump.Name = "pnlDump";
-            pnlDump.Size = new Size(898, 523);
+            pnlDump.Size = new Size(484, 245);
             pnlDump.TabIndex = 24;
             // 
             // vScrollBar1
             // 
-            vScrollBar1.Location = new Point(0, 49);
+            vScrollBar1.Location = new Point(0, 23);
             vScrollBar1.Maximum = 4097;
             vScrollBar1.Name = "vScrollBar1";
-            vScrollBar1.Size = new Size(27, 390);
+            vScrollBar1.Size = new Size(27, 183);
             vScrollBar1.TabIndex = 16;
             vScrollBar1.ValueChanged += vScrollBar1_ValueChanged;
             // 
@@ -374,10 +374,9 @@
             // 
             lbl0F.AutoSize = true;
             lbl0F.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl0F.Location = new Point(821, 21);
-            lbl0F.Margin = new Padding(6, 0, 6, 0);
+            lbl0F.Location = new Point(442, 10);
             lbl0F.Name = "lbl0F";
-            lbl0F.Size = new Size(40, 32);
+            lbl0F.Size = new Size(20, 15);
             lbl0F.TabIndex = 15;
             lbl0F.Text = "0F";
             // 
@@ -385,10 +384,9 @@
             // 
             lbl0E.AutoSize = true;
             lbl0E.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl0E.Location = new Point(774, 21);
-            lbl0E.Margin = new Padding(6, 0, 6, 0);
+            lbl0E.Location = new Point(417, 10);
             lbl0E.Name = "lbl0E";
-            lbl0E.Size = new Size(41, 32);
+            lbl0E.Size = new Size(20, 15);
             lbl0E.TabIndex = 14;
             lbl0E.Text = "0E";
             // 
@@ -396,10 +394,9 @@
             // 
             lbl0D.AutoSize = true;
             lbl0D.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl0D.Location = new Point(728, 21);
-            lbl0D.Margin = new Padding(6, 0, 6, 0);
+            lbl0D.Location = new Point(392, 10);
             lbl0D.Name = "lbl0D";
-            lbl0D.Size = new Size(46, 32);
+            lbl0D.Size = new Size(23, 15);
             lbl0D.TabIndex = 13;
             lbl0D.Text = "0D";
             // 
@@ -407,10 +404,9 @@
             // 
             lbl0C.AutoSize = true;
             lbl0C.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl0C.Location = new Point(682, 21);
-            lbl0C.Margin = new Padding(6, 0, 6, 0);
+            lbl0C.Location = new Point(367, 10);
             lbl0C.Name = "lbl0C";
-            lbl0C.Size = new Size(43, 32);
+            lbl0C.Size = new Size(21, 15);
             lbl0C.TabIndex = 12;
             lbl0C.Text = "0C";
             // 
@@ -418,10 +414,9 @@
             // 
             lbl0B.AutoSize = true;
             lbl0B.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl0B.Location = new Point(635, 21);
-            lbl0B.Margin = new Padding(6, 0, 6, 0);
+            lbl0B.Location = new Point(342, 10);
             lbl0B.Name = "lbl0B";
-            lbl0B.Size = new Size(43, 32);
+            lbl0B.Size = new Size(22, 15);
             lbl0B.TabIndex = 11;
             lbl0B.Text = "0B";
             // 
@@ -429,10 +424,9 @@
             // 
             lbl0A.AutoSize = true;
             lbl0A.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl0A.Location = new Point(589, 21);
-            lbl0A.Margin = new Padding(6, 0, 6, 0);
+            lbl0A.Location = new Point(317, 10);
             lbl0A.Name = "lbl0A";
-            lbl0A.Size = new Size(45, 32);
+            lbl0A.Size = new Size(22, 15);
             lbl0A.TabIndex = 10;
             lbl0A.Text = "0A";
             // 
@@ -440,10 +434,9 @@
             // 
             lbl09.AutoSize = true;
             lbl09.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl09.Location = new Point(542, 21);
-            lbl09.Margin = new Padding(6, 0, 6, 0);
+            lbl09.Location = new Point(292, 10);
             lbl09.Name = "lbl09";
-            lbl09.Size = new Size(42, 32);
+            lbl09.Size = new Size(21, 15);
             lbl09.TabIndex = 9;
             lbl09.Text = "09";
             // 
@@ -451,10 +444,9 @@
             // 
             lbl08.AutoSize = true;
             lbl08.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl08.Location = new Point(496, 21);
-            lbl08.Margin = new Padding(6, 0, 6, 0);
+            lbl08.Location = new Point(267, 10);
             lbl08.Name = "lbl08";
-            lbl08.Size = new Size(42, 32);
+            lbl08.Size = new Size(21, 15);
             lbl08.TabIndex = 8;
             lbl08.Text = "08";
             // 
@@ -462,10 +454,9 @@
             // 
             lbl07.AutoSize = true;
             lbl07.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl07.Location = new Point(449, 21);
-            lbl07.Margin = new Padding(6, 0, 6, 0);
+            lbl07.Location = new Point(242, 10);
             lbl07.Name = "lbl07";
-            lbl07.Size = new Size(42, 32);
+            lbl07.Size = new Size(21, 15);
             lbl07.TabIndex = 7;
             lbl07.Text = "07";
             // 
@@ -473,10 +464,9 @@
             // 
             lbl06.AutoSize = true;
             lbl06.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl06.Location = new Point(403, 21);
-            lbl06.Margin = new Padding(6, 0, 6, 0);
+            lbl06.Location = new Point(217, 10);
             lbl06.Name = "lbl06";
-            lbl06.Size = new Size(42, 32);
+            lbl06.Size = new Size(21, 15);
             lbl06.TabIndex = 6;
             lbl06.Text = "06";
             // 
@@ -484,10 +474,9 @@
             // 
             lbl05.AutoSize = true;
             lbl05.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl05.Location = new Point(357, 21);
-            lbl05.Margin = new Padding(6, 0, 6, 0);
+            lbl05.Location = new Point(192, 10);
             lbl05.Name = "lbl05";
-            lbl05.Size = new Size(42, 32);
+            lbl05.Size = new Size(21, 15);
             lbl05.TabIndex = 5;
             lbl05.Text = "05";
             // 
@@ -495,10 +484,9 @@
             // 
             lbl04.AutoSize = true;
             lbl04.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl04.Location = new Point(310, 21);
-            lbl04.Margin = new Padding(6, 0, 6, 0);
+            lbl04.Location = new Point(167, 10);
             lbl04.Name = "lbl04";
-            lbl04.Size = new Size(42, 32);
+            lbl04.Size = new Size(21, 15);
             lbl04.TabIndex = 4;
             lbl04.Text = "04";
             // 
@@ -506,10 +494,9 @@
             // 
             lbl03.AutoSize = true;
             lbl03.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl03.Location = new Point(264, 21);
-            lbl03.Margin = new Padding(6, 0, 6, 0);
+            lbl03.Location = new Point(142, 10);
             lbl03.Name = "lbl03";
-            lbl03.Size = new Size(42, 32);
+            lbl03.Size = new Size(21, 15);
             lbl03.TabIndex = 3;
             lbl03.Text = "03";
             // 
@@ -517,10 +504,9 @@
             // 
             lbl02.AutoSize = true;
             lbl02.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl02.Location = new Point(217, 21);
-            lbl02.Margin = new Padding(6, 0, 6, 0);
+            lbl02.Location = new Point(117, 10);
             lbl02.Name = "lbl02";
-            lbl02.Size = new Size(42, 32);
+            lbl02.Size = new Size(21, 15);
             lbl02.TabIndex = 2;
             lbl02.Text = "02";
             // 
@@ -528,10 +514,9 @@
             // 
             lbl01.AutoSize = true;
             lbl01.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl01.Location = new Point(171, 21);
-            lbl01.Margin = new Padding(6, 0, 6, 0);
+            lbl01.Location = new Point(92, 10);
             lbl01.Name = "lbl01";
-            lbl01.Size = new Size(42, 32);
+            lbl01.Size = new Size(21, 15);
             lbl01.TabIndex = 1;
             lbl01.Text = "01";
             // 
@@ -539,38 +524,36 @@
             // 
             lbl00.AutoSize = true;
             lbl00.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lbl00.Location = new Point(124, 21);
-            lbl00.Margin = new Padding(6, 0, 6, 0);
+            lbl00.Location = new Point(67, 10);
             lbl00.Name = "lbl00";
-            lbl00.Size = new Size(42, 32);
+            lbl00.Size = new Size(21, 15);
             lbl00.TabIndex = 0;
             lbl00.Text = "00";
             // 
             // txtSaveTo
             // 
-            txtSaveTo.Location = new Point(1088, 147);
-            txtSaveTo.Margin = new Padding(4, 2, 4, 2);
+            txtSaveTo.Location = new Point(586, 69);
+            txtSaveTo.Margin = new Padding(2, 1, 2, 1);
             txtSaveTo.Name = "txtSaveTo";
-            txtSaveTo.Size = new Size(127, 39);
+            txtSaveTo.Size = new Size(70, 23);
             txtSaveTo.TabIndex = 25;
             txtSaveTo.Text = "0xFFFF";
             // 
             // txtSaveFrom
             // 
-            txtSaveFrom.Location = new Point(906, 147);
-            txtSaveFrom.Margin = new Padding(4, 2, 4, 2);
+            txtSaveFrom.Location = new Point(488, 69);
+            txtSaveFrom.Margin = new Padding(2, 1, 2, 1);
             txtSaveFrom.Name = "txtSaveFrom";
-            txtSaveFrom.Size = new Size(127, 39);
+            txtSaveFrom.Size = new Size(70, 23);
             txtSaveFrom.TabIndex = 26;
             txtSaveFrom.Text = "0x0000";
             // 
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(1046, 154);
-            label4.Margin = new Padding(6, 0, 6, 0);
+            label4.Location = new Point(563, 72);
             label4.Name = "label4";
-            label4.Size = new Size(36, 32);
+            label4.Size = new Size(18, 15);
             label4.TabIndex = 27;
             label4.Text = "to";
             // 
@@ -578,10 +561,10 @@
             // 
             btnSave.BackColor = Color.FromArgb(192, 255, 192);
             btnSave.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            btnSave.Location = new Point(748, 137);
-            btnSave.Margin = new Padding(4, 2, 4, 2);
+            btnSave.Location = new Point(403, 64);
+            btnSave.Margin = new Padding(2, 1, 2, 1);
             btnSave.Name = "btnSave";
-            btnSave.Size = new Size(106, 64);
+            btnSave.Size = new Size(57, 30);
             btnSave.TabIndex = 28;
             btnSave.Text = "Save...";
             btnSave.UseVisualStyleBackColor = false;
@@ -591,10 +574,10 @@
             // 
             btnReset.BackColor = Color.FromArgb(255, 192, 192);
             btnReset.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            btnReset.Location = new Point(748, 0);
-            btnReset.Margin = new Padding(4, 2, 4, 2);
+            btnReset.Location = new Point(403, 0);
+            btnReset.Margin = new Padding(2, 1, 2, 1);
             btnReset.Name = "btnReset";
-            btnReset.Size = new Size(106, 64);
+            btnReset.Size = new Size(57, 30);
             btnReset.TabIndex = 29;
             btnReset.Text = "RESET";
             btnReset.UseVisualStyleBackColor = false;
@@ -603,9 +586,10 @@
             // cbUseHeader
             // 
             cbUseHeader.AutoSize = true;
-            cbUseHeader.Location = new Point(1056, 81);
+            cbUseHeader.Location = new Point(569, 38);
+            cbUseHeader.Margin = new Padding(2, 1, 2, 1);
             cbUseHeader.Name = "cbUseHeader";
-            cbUseHeader.Size = new Size(260, 36);
+            cbUseHeader.Size = new Size(131, 19);
             cbUseHeader.TabIndex = 30;
             cbUseHeader.Text = "with address header";
             cbUseHeader.UseVisualStyleBackColor = true;
@@ -615,20 +599,24 @@
             // 
             btnRun.BackColor = Color.FromArgb(192, 255, 192);
             btnRun.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            btnRun.Location = new Point(11, 85);
-            btnRun.Margin = new Padding(4, 2, 4, 2);
+            btnRun.Location = new Point(6, 40);
+            btnRun.Margin = new Padding(2, 1, 2, 1);
             btnRun.Name = "btnRun";
-            btnRun.Size = new Size(188, 64);
+            btnRun.Size = new Size(101, 30);
             btnRun.TabIndex = 31;
             btnRun.Text = "RUN";
             btnRun.UseVisualStyleBackColor = false;
             btnRun.Click += btnRun_Click;
             // 
+            // UpdateTimer
+            // 
+            UpdateTimer.Tick += UpdateTimer_Tick;
+            // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(13F, 32F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1416, 749);
+            ClientSize = new Size(762, 351);
             Controls.Add(btnRun);
             Controls.Add(cbUseHeader);
             Controls.Add(btnReset);
@@ -660,7 +648,7 @@
             Controls.Add(label3);
             Controls.Add(label1);
             Controls.Add(button1);
-            Margin = new Padding(4, 2, 4, 2);
+            Margin = new Padding(2, 1, 2, 1);
             Name = "Form1";
             Text = "Form1";
             pnlDump.ResumeLayout(false);
@@ -721,5 +709,6 @@
         private Button btnReset;
         private CheckBox cbUseHeader;
         private Button btnRun;
+        private System.Windows.Forms.Timer UpdateTimer;
     }
 }

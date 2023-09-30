@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
@@ -39,6 +40,7 @@ namespace CPU6502
         public Flags F = new Flags();
         RAM mem;
         byte OpCode;
+        ushort LastFetchAddr;
         ulong Cycles = 0;
         public bool run = false;
 
@@ -76,8 +78,8 @@ namespace CPU6502
 
         public void Fetch()
         {
-            OpCode = mem.Read(PC);
-            PC++;
+            LastFetchAddr = PC;
+            OpCode = mem.Read(PC++);
         }
 
         public void Push(byte b)
@@ -245,7 +247,10 @@ namespace CPU6502
 
                 default:
                     {
-                        throw new NotImplementedException(String.Format("OP Code {0:X2} not implemented.", OpCode));
+                        Debug.WriteLine(String.Format("**** {1:X4}: OP Code {0:X2} not implemented.", OpCode,LastFetchAddr));
+                        Console.Beep(1000, 1000);
+                        run = false;
+                        break;
                     }
             }
         }
@@ -253,7 +258,7 @@ namespace CPU6502
         public string Disassemble(ushort addr)
         {
             byte OpCode = mem.Read(addr);
-            string Assembler = String.Format("??? {0:X2} {1:X2} {2:X2}", OpCode, mem.Read((ushort)(addr + 1)),mem.Read((ushort)(addr+2)));
+            string Assembler = String.Format("??? {0:X2} {1:X2} {2:X2}", OpCode, mem.Read((ushort)(addr + 1)), mem.Read((ushort)(addr + 2)));
 
             switch (OpCode)
             {
@@ -371,10 +376,11 @@ namespace CPU6502
 
         public void Run()
         {
-            while(run)
+            while (run)
             {
                 Fetch();
                 Execute();
+                Thread.Sleep(100);
             }
         }
     }
