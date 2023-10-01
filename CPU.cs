@@ -47,6 +47,7 @@ namespace CPU6502
 
         // *************************************************
         const byte JSR = 0X20;
+        const byte AND_IMM = 0x20;
         const byte JMP_ABS = 0x4C;
         const byte RTS = 0x60;
         const byte SEI = 0x78;
@@ -92,6 +93,18 @@ namespace CPU6502
         public byte Pop()
         {
             return (mem.Read((ushort)(0x0100 + (++SP))));
+        }
+
+        public void Run()
+        {
+            while (run)
+            {
+                Fetch();
+                Execute();
+                Thread.Sleep(100);
+            }
+
+            Debug.WriteLine("CPU Halted by RUN flag.");
         }
 
         public void Execute()
@@ -388,18 +401,6 @@ namespace CPU6502
 
             return Assembler;
 
-        }
-
-        public void Run()
-        {
-            while (run)
-            {
-                Fetch();
-                Execute();
-                Thread.Sleep(100);
-            }
-
-            Debug.WriteLine("CPU Halted by RUN flag.");
-        }
+        }     
     }
 }
