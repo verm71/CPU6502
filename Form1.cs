@@ -323,10 +323,29 @@ namespace CPU6502
                 if (CPUTask.IsCompleted)
                 {
                     CPUTask.Dispose();
-                    Debug.WriteLine("CPU Thread stopped.");
                     UpdateTimer.Enabled = false;
                 };
             }
+        }
+
+        private async void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (cpu.run)
+            {
+                cpu.run = false;
+
+                if (CPUTask != null && (CPUTask.Status == TaskStatus.Running))
+                {
+                    await CPUTask;
+                    CPUTask.Dispose();
+                    Debug.WriteLine("CPU Thread stopped by program termination.");
+                }
+            }
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+           
         }
     }
 }

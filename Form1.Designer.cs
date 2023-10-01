@@ -651,6 +651,8 @@
             Margin = new Padding(2, 1, 2, 1);
             Name = "Form1";
             Text = "Form1";
+            FormClosing += Form1_FormClosing;
+            FormClosed += Form1_FormClosed;
             pnlDump.ResumeLayout(false);
             pnlDump.PerformLayout();
             ResumeLayout(false);

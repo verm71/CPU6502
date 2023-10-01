@@ -47,6 +47,7 @@ namespace CPU6502
 
         // *************************************************
         const byte JSR = 0X20;
+        const byte JMP_ABS = 0x4C;
         const byte RTS = 0x60;
         const byte SEI = 0x78;
         const byte STA_ZP = 0x85;
@@ -72,6 +73,7 @@ namespace CPU6502
 
         public void Reset()
         {
+            run = false;
             F.Reset();
             PC = (ushort)(mem.Read(0xfffc) + (mem.Read(0xfffd) << 8));
         }
@@ -245,9 +247,16 @@ namespace CPU6502
                         break;
                     }
 
+                case JMP_ABS:
+                    {
+                        ushort target = (ushort)(mem.Read(PC++) | (mem.Read(PC++) << 8));
+                        PC = target;
+                        break;
+                    }
+
                 default:
                     {
-                        Debug.WriteLine(String.Format("**** {1:X4}: OP Code {0:X2} not implemented.", OpCode,LastFetchAddr));
+                        Debug.WriteLine(String.Format("**** {1:X4}: OP Code {0:X2} not implemented.", OpCode, LastFetchAddr));
                         Console.Beep(1000, 1000);
                         run = false;
                         break;
@@ -367,6 +376,13 @@ namespace CPU6502
                         break;
                     }
 
+                case JMP_ABS:
+                    {
+                        ushort target = (ushort)(mem.Read((ushort)(addr + 1)) | (mem.Read((ushort)(addr + 2)) << 8));
+                        Assembler = string.Format("JMP ${0:X4}", target);
+                        break;
+                    }
+
 
             }
 
@@ -382,6 +398,8 @@ namespace CPU6502
                 Execute();
                 Thread.Sleep(100);
             }
+
+            Debug.WriteLine("CPU Halted by RUN flag.");
         }
     }
 }
