@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -93,8 +94,48 @@ namespace CPU6502
             // I/O?
             if (addr >= 0xD000 && addr < 0xE000 && MapMode[5] == Mapping.IO)
             {
-                Debug.WriteLine(string.Format("I/O write at {0:X4} value {1:X2}", addr, value));
+                byte page = (byte)(addr >> 8); // pages are easier to work with
+
+                if (page >= 0xD0 && page < 0xD4)
+                {
+                    // VIC-II
+                    Debug.WriteLine(string.Format("VIC-II write at {0:X4} value {1:X2}", addr, value));
+
+                }
+                else if (page >= 0xD4 && page < 0xD8)
+                {
+                    // SID
+                    Debug.WriteLine(string.Format("SID write at {0:X4} value {1:X2}", addr, value));
+
+                }
+                else if (page >= 0xD8 && page < 0xDC)
+                {
+                    // COLOR RAM
+                    Debug.WriteLine(string.Format("CRAM write at {0:X4} value {1:X2}", addr, value));
+
+                }
+                else if (page >= 0xDC && page < 0xDD)
+                {
+                    // CIA1
+                    Debug.WriteLine(string.Format("CIA1 write at {0:X4} value {1:X2}", addr, value));
+
+                }
+                else if (page >= 0xDD && page < 0xDE)
+                {
+                    // CIA2
+                    Debug.WriteLine(string.Format("CIA2 write at {0:X4} value {1:X2}", addr, value));
+
+                }
+                else if (page >= 0xDE)
+                {
+                    // I/O 1&2
+                    Debug.WriteLine(string.Format("I/O write at {0:X4} value {1:X2}", addr, value));
+
+                }
+
             }
+
+
             else
             {
                 _mem[addr] = value;
