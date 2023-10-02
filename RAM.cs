@@ -12,7 +12,7 @@ namespace CPU6502
 {
     internal class RAM
     {
-        private byte[] _mem = new byte[65536];
+        public byte[] _mem = new byte[65536]; // All reads and writes except directly from I/O chips should go through .Read and .Write to obey mapping rules.
         private byte[] BASICROM = new byte[0xc000 - 0xa000];
         static readonly string BASICROM_FILENAME = "ROMS\\basic";
 
@@ -68,6 +68,10 @@ namespace CPU6502
             { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.ROM,Mapping.MEM,Mapping.IO,Mapping.ROM}             // 31
         };
 
+        private CIA1 cia1;
+        private CIA2 cia2;
+        private VICII vic;
+
         public RAM()
         {
             // Setup I/O and mapping registers
@@ -75,6 +79,10 @@ namespace CPU6502
 
             Write(0, 0xff);
             Write(1, 0x1f);
+
+            cia1= new CIA1();
+            cia2= new CIA2();
+            vic = new VICII(cia1, cia2, this);
 
             BASICROM = File.ReadAllBytes(BASICROM_FILENAME);
             KERNALROM = File.ReadAllBytes(KERNALROM_FILENAME);
@@ -96,11 +104,9 @@ namespace CPU6502
             {
                 byte page = (byte)(addr >> 8); // pages are easier to work with
 
-                if (page >= 0xD0 && page < 0xD4)
+                if (page >= 0xD0 && page < 0xD4) // VIC-II
                 {
-                    // VIC-II
-                    Debug.WriteLine(string.Format("VIC-II write at {0:X4} value {1:X2}", addr, value));
-
+                    vic.Write(addr, value);
                 }
                 else if (page >= 0xD4 && page < 0xD8)
                 {
@@ -114,16 +120,14 @@ namespace CPU6502
                     Debug.WriteLine(string.Format("CRAM write at {0:X4} value {1:X2}", addr, value));
 
                 }
-                else if (page >= 0xDC && page < 0xDD)
+                else if (page >= 0xDC && page < 0xDD) // CIA1
                 {
-                    // CIA1
-                    Debug.WriteLine(string.Format("CIA1 write at {0:X4} value {1:X2}", addr, value));
+                    cia1.Write(addr, value);
 
                 }
-                else if (page >= 0xDD && page < 0xDE)
+                else if (page >= 0xDD && page < 0xDE) // CIA2
                 {
-                    // CIA2
-                    Debug.WriteLine(string.Format("CIA2 write at {0:X4} value {1:X2}", addr, value));
+                    cia2.Write(addr, value);
 
                 }
                 else if (page >= 0xDE)

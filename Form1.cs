@@ -10,12 +10,11 @@ namespace CPU6502
         Label[,] dump;
         Label[] addr;
         ushort dumpStart;
-        Task CPUTask = null;
+        Task? CPUTask = null;
 
         public Form1()
         {
             InitializeComponent();
-
             mem = new RAM();
             cpu = new CPU(mem);
             dump = new Label[16, 8];
@@ -24,7 +23,6 @@ namespace CPU6502
             InitializeMemoryDump();
 
             UpdateStatusDisplay();
-
         }
 
         private void InitializeMemoryDump()
@@ -345,7 +343,7 @@ namespace CPU6502
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-           
+
         }
     }
 }

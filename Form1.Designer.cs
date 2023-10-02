@@ -650,6 +650,7 @@
             Controls.Add(button1);
             Margin = new Padding(2, 1, 2, 1);
             Name = "Form1";
+            StartPosition = FormStartPosition.Manual;
             Text = "Form1";
             FormClosing += Form1_FormClosing;
             FormClosed += Form1_FormClosed;
