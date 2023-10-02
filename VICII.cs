@@ -13,6 +13,15 @@ namespace CPU6502
         CIA2 c2;
         RAM mem;
 
+        // Control Register 1
+        bool BlankScreenToBorderColor;
+        bool Twenty5Rows;
+
+        // Control Rogister 2
+        bool MultiColorMode;
+        bool FortyColumns;        
+        byte SmoothScrollX;
+
         public VICII(CIA1 cia1, CIA2 cia2, RAM ram)
         {
             c1 = cia1;
@@ -26,6 +35,9 @@ namespace CPU6502
             {
                 case 0xD016:
                     {
+                        MultiColorMode = ((byte)(Value & 0x10) !=0);
+                        FortyColumns = ((byte)(Value & 0x08) != 0);
+                        SmoothScrollX = ((byte)(Value & 0x07));
                         mem._mem[Addr] = Value;
                         break;
                     }

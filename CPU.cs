@@ -103,7 +103,7 @@ namespace CPU6502
             {
                 Fetch();
                 Execute();
-                Thread.Sleep(100);
+                Thread.Sleep(10);
             }
 
             Debug.WriteLine("CPU Halted by RUN flag.");
