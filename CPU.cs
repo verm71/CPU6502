@@ -46,6 +46,7 @@ namespace CPU6502
 
 
         // *************************************************
+        const byte ORA_IMM = 0X09;
         const byte JSR = 0X20;
         const byte AND_IMM = 0x29;
         const byte JMP_ABS = 0x4C;
@@ -271,6 +272,17 @@ namespace CPU6502
                     {
                         byte operand = mem.Read(PC++);
                         A = (byte)(A & operand);
+                        F.Z=(A == 0);
+                        F.N= (A & 0x80) != 0;
+                        break;
+                    }
+
+                case ORA_IMM:
+                    {
+                        byte operand = mem.Read(PC++);
+                        A = (byte)(A | operand);
+                        F.Z=(A == 0);
+                        F.N=(A & 0x80) != 0;
                         break;
                     }
 
@@ -409,6 +421,14 @@ namespace CPU6502
                         Assembler = string.Format("AND #{0:X2}",operand);
                         break;
                     }
+
+                case ORA_IMM:
+                    {
+                        byte operand = mem.Read((ushort)(addr + 1));
+                        Assembler = string.Format("ORA #{0:X2}", operand);
+                        break;
+                    }
+
             }
 
             return Assembler;
