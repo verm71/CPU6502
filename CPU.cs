@@ -57,6 +57,7 @@ namespace CPU6502
         const byte STX_ABS = 0x8E;
         const byte TXS = 0x9A;
         const byte LDX_IMM = 0XA2;
+        const byte TAY = 0xA8;
         const byte LDA_IMM = 0xA9;
         const byte LDA_ABS = 0xAD;
         const byte LDA_ABS_X = 0xBD;
@@ -272,8 +273,8 @@ namespace CPU6502
                     {
                         byte operand = mem.Read(PC++);
                         A = (byte)(A & operand);
-                        F.Z=(A == 0);
-                        F.N= (A & 0x80) != 0;
+                        F.Z = (A == 0);
+                        F.N = (A & 0x80) != 0;
                         break;
                     }
 
@@ -281,11 +282,18 @@ namespace CPU6502
                     {
                         byte operand = mem.Read(PC++);
                         A = (byte)(A | operand);
-                        F.Z=(A == 0);
-                        F.N=(A & 0x80) != 0;
+                        F.Z = (A == 0);
+                        F.N = (A & 0x80) != 0;
                         break;
                     }
 
+                case TAY:
+                    {
+                        Y = A;
+                        F.Z= (Y == 0);
+                        F.N= (Y & 0x80) != 0;
+                        break;
+                    }
                 default:
                     {
                         Debug.WriteLine(String.Format("**** {1:X4}: OP Code {0:X2} not implemented.", OpCode, LastFetchAddr));
@@ -418,7 +426,7 @@ namespace CPU6502
                 case AND_IMM:
                     {
                         byte operand = mem.Read((ushort)(addr + 1));
-                        Assembler = string.Format("AND #{0:X2}",operand);
+                        Assembler = string.Format("AND #{0:X2}", operand);
                         break;
                     }
 
@@ -429,6 +437,11 @@ namespace CPU6502
                         break;
                     }
 
+                case TAY:
+                    {
+                        Assembler = "TAY";
+                        break;
+                    }
             }
 
             return Assembler;

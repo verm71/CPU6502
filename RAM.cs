@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace CPU6502
 {
     internal class RAM
     {
-        private byte[] mem = new byte[65536];
+        private byte[] _mem = new byte[65536];
         private byte[] BASICROM = new byte[0xc000 - 0xa000];
         static readonly string BASICROM_FILENAME = "ROMS\\basic";
 
@@ -20,39 +21,196 @@ namespace CPU6502
         private byte[] CHARROM = new byte[0xe000 - 0xd000];
         static readonly string CHARROM_FILENAME = "ROMS\\chargen";
 
+        Mapping[] MapMode;
+        enum Mapping
+        {
+            NOMAP,
+            MEM,
+            ROM,
+            IO,
+            CART_ROM_HI,
+            CART_ROM_LO
+        }
+
+        Mapping[,] Map = {
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM},            // 0
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM},            // 1
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM, Mapping.CART_ROM_HI,Mapping.MEM,Mapping.ROM,Mapping.ROM},   // 2
+            { Mapping.MEM,Mapping.MEM,Mapping.CART_ROM_LO,Mapping.CART_ROM_HI,Mapping.MEM,Mapping.ROM,Mapping.ROM},            // 3
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM},            // 4
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.IO,Mapping.MEM},            // 5
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.CART_ROM_HI,Mapping.MEM,Mapping.MEM,Mapping.ROM},    // 6
+            { Mapping.MEM,Mapping.MEM,Mapping.CART_ROM_LO,Mapping.CART_ROM_HI,Mapping.MEM,Mapping.IO,Mapping.ROM}, // 7
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM},            // 8
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.ROM,Mapping.MEM},            // 9
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.ROM,Mapping.ROM},            // 10
+            { Mapping.MEM,Mapping.MEM,Mapping.CART_ROM_LO,Mapping.ROM,Mapping.MEM,Mapping.ROM,Mapping.ROM},    // 11
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM},            // 12
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.IO,Mapping.MEM},            // 13
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.IO,Mapping.ROM},            // 14
+            { Mapping.MEM,Mapping.MEM,Mapping.CART_ROM_LO,Mapping.ROM,Mapping.MEM,Mapping.IO,Mapping.ROM},      // 15
+            { Mapping.MEM,Mapping.NOMAP,Mapping.CART_ROM_LO,Mapping.NOMAP,Mapping.NOMAP,Mapping.IO,Mapping.CART_ROM_HI},// 16
+            { Mapping.MEM,Mapping.NOMAP,Mapping.CART_ROM_LO,Mapping.NOMAP,Mapping.NOMAP,Mapping.IO,Mapping.CART_ROM_HI},// 17
+            { Mapping.MEM,Mapping.NOMAP,Mapping.CART_ROM_LO,Mapping.NOMAP,Mapping.NOMAP,Mapping.IO,Mapping.CART_ROM_HI},// 18
+            { Mapping.MEM,Mapping.NOMAP,Mapping.CART_ROM_LO,Mapping.NOMAP,Mapping.NOMAP,Mapping.IO,Mapping.CART_ROM_HI},// 19
+            { Mapping.MEM,Mapping.NOMAP,Mapping.CART_ROM_LO,Mapping.NOMAP,Mapping.NOMAP,Mapping.IO,Mapping.CART_ROM_HI},// 20
+            { Mapping.MEM,Mapping.NOMAP,Mapping.CART_ROM_LO,Mapping.NOMAP,Mapping.NOMAP,Mapping.IO,Mapping.CART_ROM_HI},// 21
+            { Mapping.MEM,Mapping.NOMAP,Mapping.CART_ROM_LO,Mapping.NOMAP,Mapping.NOMAP,Mapping.IO,Mapping.CART_ROM_HI},// 22
+            { Mapping.MEM,Mapping.NOMAP,Mapping.CART_ROM_LO,Mapping.NOMAP,Mapping.NOMAP,Mapping.IO,Mapping.CART_ROM_HI},// 23
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM},            // 24
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.ROM,Mapping.MEM},            // 25
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.ROM,Mapping.ROM},            // 26
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.ROM,Mapping.MEM,Mapping.ROM,Mapping.ROM},            // 27
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM},            // 28
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.IO,Mapping.MEM},            // 29
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.IO,Mapping.ROM},            // 30
+            { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.ROM,Mapping.MEM,Mapping.IO,Mapping.ROM}             // 31
+        };
+
         public RAM()
         {
             // Setup I/O and mapping registers
-            mem[0] = 0xff;
-            mem[1] = 0x1f;
+            MapMode = new Mapping[7];
+
+            Write(0, 0xff);
+            Write(1, 0x1f);
 
             BASICROM = File.ReadAllBytes(BASICROM_FILENAME);
             KERNALROM = File.ReadAllBytes(KERNALROM_FILENAME);
             CHARROM = File.ReadAllBytes(CHARROM_FILENAME);
         }
 
-        public byte Read(ushort addr)
+        public void Write(ushort addr, byte value)
         {
-            if (addr >= 0xa000 && addr <= 0xbfff && (mem[1] & 0x1) != 0)
+            if (addr == 1)
             {
-                return BASICROM[addr - 0xa000]; // return BASIC ROM
+                for (int i = 0; i < 7; i++)
+                {
+                    MapMode[i] = Map[value & 0x1F, i];
+                }
             }
-            else if (addr >= 0xe000 && addr <= 0xffff && (mem[1] & 0x2) != 0)
+
+            // I/O?
+            if (addr >= 0xD000 && addr < 0xE000 && MapMode[5] == Mapping.IO)
             {
-                return KERNALROM[addr - 0xe000]; // return KERNAL ROM
-            }
-            else if (addr >= 0xd000 && addr <= 0xdfff && (mem[1] & 0x4) != 0)
-            {
-                return CHARROM[addr - 0xd000];
+                Debug.WriteLine(string.Format("I/O write at {0:X4} value {1:X2}", addr, value));
             }
             else
             {
-                return mem[addr];
+                _mem[addr] = value;
             }
         }
 
-        public void Write(ushort addr, byte value)
-        { mem[addr] = value; }
+        public byte Read(ushort addr)
+        {
+            ushort page = (ushort)(addr >> 8);
 
+            if (page >= 0x00 && page <= 15)
+            {
+                return _mem[addr];
+            }
+            else if (page >= 0x10 && page <= 127)
+            {
+                if (MapMode[1] == Mapping.MEM)
+                {
+                    return _mem[addr];
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            else if (page >= 0x80 && page <= 159)
+            {
+                switch (MapMode[2])
+                {
+                    case Mapping.MEM:
+                        {
+                            return _mem[addr];
+                        }
+                    case Mapping.CART_ROM_LO:
+                        {
+                            return 0xF0;
+                            //throw new NotImplementedException("Cartridge ROM LO not implemented.");
+                        }
+                }
+            }
+            else if (page >= 0xA0 && page <= 191)
+            {
+                switch (MapMode[3])
+                {
+                    case Mapping.MEM:
+                        {
+                            return _mem[addr];
+                        }
+                    case Mapping.ROM:
+                        {
+                            return BASICROM[addr - 0xa000];
+                        }
+                    case Mapping.NOMAP:
+                        {
+                            return 0xFF;
+                        }
+                    case Mapping.CART_ROM_HI:
+                        {
+                            return 0x0F;
+                            //throw new NotImplementedException("Cartridge ROM HI not implemented.");
+                        }
+                }
+            }
+            else if (page >= 0xC0 && page <= 207)
+            {
+                switch (MapMode[4])
+                {
+                    case Mapping.MEM:
+                        {
+                            return _mem[addr];
+                        }
+                    case Mapping.NOMAP:
+                        {
+                            return 0xFF;
+                        }
+                }
+            }
+            else if (page >= 0xD0 && page <= 223)
+            {
+                switch (MapMode[5])
+                {
+                    case Mapping.MEM:
+                        {
+                            return _mem[addr];
+                        }
+                    case Mapping.ROM:
+                        {
+                            return CHARROM[addr - 0xd000];
+                        }
+                    case Mapping.IO:
+                        {
+                            return 0x00;   // not implemented
+                        }
+                }
+            }
+            else if (page >= 0xE0 && page <= 255)
+            {
+                switch (MapMode[6])
+                {
+                    case Mapping.MEM:
+                        {
+                            return _mem[addr];
+                        }
+                    case Mapping.ROM:
+                        {
+                            return KERNALROM[addr - 0xe000];
+                        }
+                    case Mapping.CART_ROM_HI:
+                        {
+                            return 0x0F;
+                            //throw new NotImplementedException("Cartridge ROM HI not implemented.");
+                        }
+                }
+            }
+
+            throw new Exception(string.Format("Unsupported memory map mode {0:X2} for address {1:X4}", _mem[1], addr));
+        }
     }
 }
