@@ -9,9 +9,11 @@ namespace CPU6502
 {
     internal class VICII
     {
-        CIA1 c1;
-        CIA2 c2;
+        CIA c1;
+        CIA c2;
         RAM mem;
+        Display display;
+        byte CurrentRaster;
 
         // Control Register 1
         bool BlankScreenToBorderColor;
@@ -19,14 +21,17 @@ namespace CPU6502
 
         // Control Rogister 2
         bool MultiColorMode;
-        bool FortyColumns;        
+        bool FortyColumns;
         byte SmoothScrollX;
 
-        public VICII(CIA1 cia1, CIA2 cia2, RAM ram)
+        public VICII(CIA cia1, CIA cia2, RAM ram)
         {
             c1 = cia1;
             c2 = cia2;
             mem = ram;
+            display = new Display();
+            display.Show();
+            Task.Run(UpdateDisplay);
         }
 
         public void Write(ushort Addr, byte Value)
@@ -35,7 +40,7 @@ namespace CPU6502
             {
                 case 0xD016:
                     {
-                        MultiColorMode = ((byte)(Value & 0x10) !=0);
+                        MultiColorMode = ((byte)(Value & 0x10) != 0);
                         FortyColumns = ((byte)(Value & 0x08) != 0);
                         SmoothScrollX = ((byte)(Value & 0x07));
                         mem._mem[Addr] = Value;
@@ -47,6 +52,21 @@ namespace CPU6502
                         break;
                     }
             }
+        }
+
+        void UpdateDisplay()
+        {
+            while (!display.IsDisposed)
+            {
+
+
+                CurrentRaster++;
+                CurrentRaster = (byte)(CurrentRaster % 200);
+                Thread.Sleep(1000 / 60);
+            }
+
+            Debug.WriteLine("Display thread stopped by disposal of screen.");
+            Console.Beep(500, 500);
         }
     }
 }

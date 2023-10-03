@@ -610,6 +610,7 @@
             // 
             // UpdateTimer
             // 
+            UpdateTimer.Interval = 20;
             UpdateTimer.Tick += UpdateTimer_Tick;
             // 
             // Form1

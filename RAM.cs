@@ -68,8 +68,8 @@ namespace CPU6502
             { Mapping.MEM,Mapping.MEM,Mapping.MEM,Mapping.ROM,Mapping.MEM,Mapping.IO,Mapping.ROM}             // 31
         };
 
-        private CIA1 cia1;
-        private CIA2 cia2;
+        private CIA cia1;
+        private CIA cia2;
         private VICII vic;
 
         public RAM()
@@ -80,8 +80,8 @@ namespace CPU6502
             Write(0, 0xff);
             Write(1, 0x1f);
 
-            cia1= new CIA1();
-            cia2= new CIA2();
+            cia1= new CIA();
+            cia2= new CIA();
             vic = new VICII(cia1, cia2, this);
 
             BASICROM = File.ReadAllBytes(BASICROM_FILENAME);
