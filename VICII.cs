@@ -9,11 +9,13 @@ namespace CPU6502
 {
     internal class VICII
     {
-        CIA c1;
-        CIA c2;
+        CIA1 cia1;
+        CIA2 cia2;
         RAM mem;
         Display display;
         byte CurrentRaster;
+        ushort _BaseMemory;
+
 
         // Control Register 1
         bool BlankScreenToBorderColor;
@@ -24,10 +26,12 @@ namespace CPU6502
         bool FortyColumns;
         byte SmoothScrollX;
 
-        public VICII(CIA cia1, CIA cia2, RAM ram)
+        public VICII(CIA1 Cia1, CIA2 Cia2, RAM ram)
         {
-            c1 = cia1;
-            c2 = cia2;
+            cia1 = Cia1;
+            cia2 = Cia2;
+            cia1.vic = this; cia2.vic = this;
+
             mem = ram;
             display = new Display();
             display.Show();
@@ -54,6 +58,32 @@ namespace CPU6502
             }
         }
 
+        public void SetBank(byte Bank)
+        {
+            switch (Bank)
+            {
+                case 0x00:
+                    {
+                        _BaseMemory = 0x0000;
+                        break;
+                    }
+                case 0x01:
+                    {
+                        _BaseMemory = 0x4000;
+                        break;
+                    }
+                case 0x02:
+                    {
+                        _BaseMemory = 0x8000;
+                        break;
+                    }
+                case 0x03:
+                    {
+                        _BaseMemory = 0xc000;
+                        break;
+                    }
+            }
+        }
         void UpdateDisplay()
         {
             while (!display.IsDisposed)

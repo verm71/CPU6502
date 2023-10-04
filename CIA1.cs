@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 
 namespace CPU6502
 {
-    internal class CIA
+    internal class CIA1
     {
+        public VICII vic;
+
         // 0D CIA Interrupt Control Register
         bool IRQFlag;
         bool Flag1IRQ;
@@ -34,7 +36,7 @@ namespace CPU6502
 
                 default:
                     {
-                        Debug.WriteLine("Unhandled write to CIA at {0:X4} value {1:X2}", Addr, Value);
+                        Debug.WriteLine("Unhandled write to CIA1 at {0:X4} value {1:X2}", Addr, Value);
                         break;
                     }
             }
