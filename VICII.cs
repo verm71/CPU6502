@@ -89,7 +89,7 @@ namespace CPU6502
         {
             while (!display.IsDisposed)
             {
-
+                
 
                 CurrentRaster++;
                 CurrentRaster = (byte)(CurrentRaster % 200);
