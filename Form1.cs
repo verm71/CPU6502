@@ -23,6 +23,7 @@ namespace CPU6502
             InitializeMemoryDump();
 
             UpdateStatusDisplay();
+            rb1M.Checked = true;
         }
 
         private void InitializeMemoryDump()
@@ -341,9 +342,29 @@ namespace CPU6502
             }
         }
 
-        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        private void rbZero_CheckedChanged(object sender, EventArgs e)
         {
+            if (rbZero.Checked) { cpu.OpCodePauseNanoseconds = 0; }
+        }
 
+        private void rb10K_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rb10K.Checked) { cpu.OpCodePauseNanoseconds = 10000; }
+        }
+
+        private void rb100K_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rb100K.Checked) { cpu.OpCodePauseNanoseconds = 100000; }
+        }
+
+        private void rb1M_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rb1M.Checked) { cpu.OpCodePauseNanoseconds = 1000000; }
+        }
+
+        private void rb100M_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rb100M.Checked) { cpu.OpCodePauseNanoseconds = 100000000; }
         }
     }
 }

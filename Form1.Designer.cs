@@ -80,7 +80,14 @@
             cbUseHeader = new CheckBox();
             btnRun = new Button();
             UpdateTimer = new System.Windows.Forms.Timer(components);
+            groupBox1 = new GroupBox();
+            rb100M = new RadioButton();
+            rb1M = new RadioButton();
+            rb100K = new RadioButton();
+            rb10K = new RadioButton();
+            rbZero = new RadioButton();
             pnlDump.SuspendLayout();
+            groupBox1.SuspendLayout();
             SuspendLayout();
             // 
             // button1
@@ -356,7 +363,7 @@
             pnlDump.Controls.Add(lbl02);
             pnlDump.Controls.Add(lbl01);
             pnlDump.Controls.Add(lbl00);
-            pnlDump.Location = new Point(42, 94);
+            pnlDump.Location = new Point(18, 129);
             pnlDump.Name = "pnlDump";
             pnlDump.Size = new Size(484, 245);
             pnlDump.TabIndex = 24;
@@ -613,11 +620,81 @@
             UpdateTimer.Interval = 20;
             UpdateTimer.Tick += UpdateTimer_Tick;
             // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(rb100M);
+            groupBox1.Controls.Add(rb1M);
+            groupBox1.Controls.Add(rb100K);
+            groupBox1.Controls.Add(rb10K);
+            groupBox1.Controls.Add(rbZero);
+            groupBox1.Location = new Point(6, 79);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(325, 44);
+            groupBox1.TabIndex = 32;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "OPCode Wait Time";
+            // 
+            // rb100M
+            // 
+            rb100M.AutoSize = true;
+            rb100M.Location = new Point(257, 19);
+            rb100M.Name = "rb100M";
+            rb100M.Size = new Size(62, 19);
+            rb100M.TabIndex = 4;
+            rb100M.Text = "100 ms";
+            rb100M.UseVisualStyleBackColor = true;
+            rb100M.CheckedChanged += rb100M_CheckedChanged;
+            // 
+            // rb1M
+            // 
+            rb1M.AutoSize = true;
+            rb1M.Location = new Point(201, 19);
+            rb1M.Name = "rb1M";
+            rb1M.Size = new Size(50, 19);
+            rb1M.TabIndex = 3;
+            rb1M.Text = "1 ms";
+            rb1M.UseVisualStyleBackColor = true;
+            rb1M.CheckedChanged += rb1M_CheckedChanged;
+            // 
+            // rb100K
+            // 
+            rb100K.AutoSize = true;
+            rb100K.Location = new Point(137, 19);
+            rb100K.Name = "rb100K";
+            rb100K.Size = new Size(58, 19);
+            rb100K.TabIndex = 2;
+            rb100K.Text = "100 µs";
+            rb100K.UseVisualStyleBackColor = true;
+            rb100K.CheckedChanged += rb100K_CheckedChanged;
+            // 
+            // rb10K
+            // 
+            rb10K.AutoSize = true;
+            rb10K.Location = new Point(79, 19);
+            rb10K.Name = "rb10K";
+            rb10K.Size = new Size(52, 19);
+            rb10K.TabIndex = 1;
+            rb10K.Text = "10 µs";
+            rb10K.UseVisualStyleBackColor = true;
+            rb10K.CheckedChanged += rb10K_CheckedChanged;
+            // 
+            // rbZero
+            // 
+            rbZero.AutoSize = true;
+            rbZero.Location = new Point(7, 19);
+            rbZero.Name = "rbZero";
+            rbZero.Size = new Size(66, 19);
+            rbZero.TabIndex = 0;
+            rbZero.Text = "No wait";
+            rbZero.UseVisualStyleBackColor = true;
+            rbZero.CheckedChanged += rbZero_CheckedChanged;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(762, 351);
+            ClientSize = new Size(762, 376);
+            Controls.Add(groupBox1);
             Controls.Add(btnRun);
             Controls.Add(cbUseHeader);
             Controls.Add(btnReset);
@@ -654,9 +731,10 @@
             StartPosition = FormStartPosition.Manual;
             Text = "Form1";
             FormClosing += Form1_FormClosing;
-            FormClosed += Form1_FormClosed;
             pnlDump.ResumeLayout(false);
             pnlDump.PerformLayout();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -714,5 +792,11 @@
         private CheckBox cbUseHeader;
         private Button btnRun;
         private System.Windows.Forms.Timer UpdateTimer;
+        private GroupBox groupBox1;
+        private RadioButton rb10K;
+        private RadioButton rbZero;
+        private RadioButton rb100K;
+        private RadioButton rb100M;
+        private RadioButton rb1M;
     }
 }

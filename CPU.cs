@@ -43,6 +43,7 @@ namespace CPU6502
         ushort LastFetchAddr;
         ulong Cycles = 0;
         public bool run = false;
+        public int OpCodePauseNanoseconds = 100000;
 
 
         // *************************************************
@@ -55,6 +56,7 @@ namespace CPU6502
         const byte STA_ZP = 0x85;
         const byte STA_ABS = 0x8D;
         const byte STX_ABS = 0x8E;
+        const byte STA_ABS_Y = 0x99;
         const byte TXS = 0x9A;
         const byte LDX_IMM = 0XA2;
         const byte TAY = 0xA8;
@@ -62,6 +64,7 @@ namespace CPU6502
         const byte LDA_ABS = 0xAD;
         const byte LDA_ABS_X = 0xBD;
         const byte DEX = 0xCA;
+        const byte INY = 0xC8;
         const byte BNE_REL = 0xD0;
         const byte CLD = 0xD8;
         const byte CMP_ABS_X = 0xDD;
@@ -103,7 +106,9 @@ namespace CPU6502
             {
                 Fetch();
                 Execute();
-                Thread.Sleep(10);
+                //Thread.Sleep(1);
+                DateTime end = DateTime.Now + new TimeSpan(OpCodePauseNanoseconds / 100);
+                while (DateTime.Now < end) { Thread.Yield(); }
             }
 
             Debug.WriteLine("CPU Halted by RUN flag.");
@@ -290,10 +295,26 @@ namespace CPU6502
                 case TAY:
                     {
                         Y = A;
-                        F.Z= (Y == 0);
-                        F.N= (Y & 0x80) != 0;
+                        F.Z = (Y == 0);
+                        F.N = (Y & 0x80) != 0;
                         break;
                     }
+
+                case STA_ABS_Y:
+                    {
+                        ushort addr = (ushort)(mem.Read(PC++) + (mem.Read(PC++) << 8) + Y);
+                        mem.Write(addr, A);
+                        break;
+                    }
+
+                case INY:
+                    {
+                        Y++;
+                        F.N = (Y & 0x80) != 0;
+                        F.Z = Y == 0;
+                        break;
+                    }
+
                 default:
                     {
                         Debug.WriteLine(String.Format("**** {1:X4}: OP Code {0:X2} not implemented.", OpCode, LastFetchAddr));
@@ -440,6 +461,19 @@ namespace CPU6502
                 case TAY:
                     {
                         Assembler = "TAY";
+                        break;
+                    }
+
+                case STA_ABS_Y:
+                    {
+                        ushort operand = (ushort)(mem.Read((ushort)(addr + 1)) + (mem.Read((ushort)(addr + 2)) << 8));
+                        Assembler = string.Format("STA ${0:X4}+Y  {1:X4}", operand, operand + Y);
+                        break;
+                    }
+
+                case INY:
+                    {
+                        Assembler = "INY";
                         break;
                     }
             }

@@ -15,16 +15,21 @@ namespace CPU6502
         Display display;
         byte CurrentRaster;
         ushort _BaseMemory;
+        ushort _VideoMatrixAddress;
 
 
         // Control Register 1
         bool BlankScreenToBorderColor;
         bool Twenty5Rows;
 
-        // Control Rogister 2
+        // Control Rogister 2: D016
         bool MultiColorMode;
         bool FortyColumns;
         byte SmoothScrollX;
+
+        // D018
+        byte VideoMatrixBaseAddress;
+        byte CharacterDotDataBaseAddress;
 
         public VICII(CIA1 Cia1, CIA2 Cia2, RAM ram)
         {
@@ -50,6 +55,15 @@ namespace CPU6502
                         mem._mem[Addr] = Value;
                         break;
                     }
+
+                case 0xD018:
+                    {
+                        VideoMatrixBaseAddress = (byte)(Value & 0xF0 >> 4);
+                        _VideoMatrixAddress = (ushort)(_BaseMemory + VideoMatrixBaseAddress * 64);
+                        CharacterDotDataBaseAddress = (byte)(Value & 0x0E);
+                        break;
+                    }
+
                 default:
                     {
                         Debug.WriteLine("Unhandled write to VIC-II at {0:X4} value {1:X2}", Addr, Value);
