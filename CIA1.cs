@@ -19,6 +19,11 @@ namespace CPU6502
         bool TimerBINT;
         bool TimerAINT;
 
+        public CIA1(VICII Vic)
+        {
+            this.vic = Vic;
+        }
+
         public void Write(ushort Addr, byte Value)
         {
             switch (Addr & 0x000F)

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
 
 namespace CPU6502
 {
@@ -14,8 +15,22 @@ namespace CPU6502
         RAM mem;
         Display display;
         byte CurrentRaster;
-        ushort _BaseMemory;
-        ushort _VideoMatrixAddress;
+        public byte bank;
+
+        public ushort _BaseMemory
+        {
+            get
+            {
+                return (ushort)(bank * 0x4000);
+            }
+        }
+        public ushort _VideoMatrixAddress
+        {
+            get
+            {
+                return (ushort)(VideoMatrixBaseAddress * 64 + _BaseMemory);
+            }
+        }
 
 
         // Control Register 1
@@ -31,11 +46,10 @@ namespace CPU6502
         byte VideoMatrixBaseAddress;
         byte CharacterDotDataBaseAddress;
 
-        public VICII(CIA1 Cia1, CIA2 Cia2, RAM ram)
+        public VICII(ref CIA1 Cia1, ref CIA2 Cia2, RAM ram)
         {
-            cia1 = Cia1;
-            cia2 = Cia2;
-            cia1.vic = this; cia2.vic = this;
+            Cia1=cia1 = new CIA1(this);
+            Cia2=cia2 = new CIA2(this);
 
             mem = ram;
             display = new Display();
@@ -59,7 +73,6 @@ namespace CPU6502
                 case 0xD018:
                     {
                         VideoMatrixBaseAddress = (byte)(Value & 0xF0 >> 4);
-                        _VideoMatrixAddress = (ushort)(_BaseMemory + VideoMatrixBaseAddress * 64);
                         CharacterDotDataBaseAddress = (byte)(Value & 0x0E);
                         break;
                     }
@@ -72,32 +85,6 @@ namespace CPU6502
             }
         }
 
-        public void SetBank(byte Bank)
-        {
-            switch (Bank)
-            {
-                case 0x00:
-                    {
-                        _BaseMemory = 0x0000;
-                        break;
-                    }
-                case 0x01:
-                    {
-                        _BaseMemory = 0x4000;
-                        break;
-                    }
-                case 0x02:
-                    {
-                        _BaseMemory = 0x8000;
-                        break;
-                    }
-                case 0x03:
-                    {
-                        _BaseMemory = 0xc000;
-                        break;
-                    }
-            }
-        }
         void UpdateDisplay()
         {
             while (!display.IsDisposed)

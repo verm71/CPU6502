@@ -29,6 +29,11 @@ namespace CPU6502
         bool TimerBINT;
         bool TimerAINT;
 
+        public CIA2(VICII Vic)
+        {
+            this.vic = Vic;
+        }
+
         public void Write(ushort Addr, byte Value)
         {
             switch (Addr & 0x000F)
@@ -42,7 +47,7 @@ namespace CPU6502
                         SerialBusATNOut = (Value & 0x08) != 0;
                         RS232Out = (Value & 0x04) != 0;
                         VICBankSelect = (byte)(Value & 0x03);
-                        vic.SetBank(VICBankSelect);
+                        vic.bank = VICBankSelect;
                         break;
                     }
 

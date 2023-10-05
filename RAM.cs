@@ -80,9 +80,7 @@ namespace CPU6502
             Write(0, 0xff);
             Write(1, 0x1f);
 
-            cia1= new CIA1();
-            cia2= new CIA2();
-            vic = new VICII(cia1, cia2, this);
+            vic = new VICII(ref cia1, ref cia2, this);
 
             BASICROM = File.ReadAllBytes(BASICROM_FILENAME);
             KERNALROM = File.ReadAllBytes(KERNALROM_FILENAME);
