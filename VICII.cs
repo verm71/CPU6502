@@ -93,7 +93,7 @@ namespace CPU6502
 
                 CurrentRaster++;
                 CurrentRaster = (byte)(CurrentRaster % 200);
-                Thread.Sleep(1000 / 60);
+                Thread.Sleep(1);
             }
 
             Debug.WriteLine("Display thread stopped by disposal of screen.");
