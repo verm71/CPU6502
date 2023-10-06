@@ -58,6 +58,7 @@ namespace CPU6502
         const byte STY_ZP = 0x84;
         const byte STA_ZP = 0x85;
         const byte STX_ZP = 0x86;
+        const byte TXA = 0x8A;
         const byte STA_ABS = 0x8D;
         const byte STX_ABS = 0x8E;
         const byte STA_IND_Y = 0x91;
@@ -317,6 +318,7 @@ namespace CPU6502
                 case LDY_IMM:
                     {
                         byte operand = mem.Read(PC++);
+                        Y = operand;
                         F.N = (Y & 0x80) != 0;
                         F.Z = Y == 0;
                         break;
@@ -382,6 +384,13 @@ namespace CPU6502
                         A += (byte)(F.C ? 1 : 0);  // [76543210] <- C
                         F.Z = (A == 0);
                         F.N = (A & 0x80) != 0;
+                        break;
+                    }
+                case TXA:
+                    {
+                        A = X;
+                        F.N= (A & 0x80) != 0;
+                        F.Z= (A == 0);
                         break;
                     }
                 case BCS_REL:
@@ -574,19 +583,24 @@ namespace CPU6502
                     {
                         ushort operand = (ushort)(mem.Read((ushort)(addr + 1)));
                         ushort address = (ushort)(mem.Read(operand) + mem.Read((ushort)(operand + 1)) << 8);
-                        Assembler = string.Format("STA ({0:X2},Y  {1:X4}", operand, address);
+                        Assembler = string.Format("STA ({0:X2}),Y  {1:X4}", operand, address);
                         break;
                     }
                 case CMP_IND_Y:
                     {
                         ushort operand = (ushort)(mem.Read((ushort)(addr + 1)));
                         ushort address = (ushort)(mem.Read(operand) + mem.Read((ushort)(operand + 1)) << 8);
-                        Assembler = string.Format("CMP ({0:X2},Y  {1:X4}", operand, address);
+                        Assembler = string.Format("CMP ({0:X2}),Y  {1:X4}", operand, address);
                         break;
                     }
                 case ROL:
                     {
                         Assembler = "ROL";
+                        break;
+                    }
+                case TXA:
+                    {
+                        Assembler = "TXA";
                         break;
                     }
                 case BCS_REL:

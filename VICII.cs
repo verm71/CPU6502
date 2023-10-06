@@ -110,7 +110,7 @@ namespace CPU6502
                         }
                         else
                         {
-                            scr.SetPixel(c * 8 + b, CurrentRaster, palette[mem._mem[0xD021]]);
+                            scr.SetPixel(c * 8 + b, CurrentRaster, palette[mem._mem[0xD021] & 0x0F]);
                         }
                         bm >>= 1;
                     }
