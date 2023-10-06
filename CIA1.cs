@@ -10,6 +10,7 @@ namespace CPU6502
     internal class CIA1
     {
         public VICII vic;
+        RAM mem;
 
         // 0D CIA Interrupt Control Register
         bool IRQFlag;
@@ -19,13 +20,16 @@ namespace CPU6502
         bool TimerBINT;
         bool TimerAINT;
 
-        public CIA1(VICII Vic)
+        public CIA1(VICII Vic,RAM Mem)
         {
             this.vic = Vic;
+            this.mem = Mem;
         }
 
         public void Write(ushort Addr, byte Value)
         {
+            mem._mem[Addr] = Value;
+
             switch (Addr & 0x000F)
             {
                 case 0x0D:

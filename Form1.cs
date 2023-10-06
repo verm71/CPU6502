@@ -215,7 +215,17 @@ namespace CPU6502
                 working = working.Substring(2);
             }
 
-            ushort value = ushort.Parse(working, NumberStyles.HexNumber);
+            ushort value;
+
+            try
+            {
+                value = ushort.Parse(working, NumberStyles.HexNumber);
+            }
+            catch
+            {
+                lblPC.Text = "0x0000";
+                value = 0;
+            }
             cpu.PC = value;
 
             UpdateStatusDisplay();
@@ -282,17 +292,17 @@ namespace CPU6502
                 ushort end = ushort.Parse(txtSaveTo.Text, NumberStyles.HexNumber);
 
                 byte[] buf = new byte[end - begin + 3];  // include possible start address vector
-                
+
                 byte offset = (byte)(cbUseHeader.Checked ? 2 : 0);
                 if (cbUseHeader.Checked)
                 {
-                    buf[0]=(byte)(begin & 0xff);
+                    buf[0] = (byte)(begin & 0xff);
                     buf[1] = (byte)(begin >> 8);
                 }
 
-                for (int i = 0; i < buf.Length-offset; i++)
+                for (int i = 0; i < buf.Length - offset; i++)
                 {
-                    buf[i+offset] = mem.Read((ushort)(begin + i));
+                    buf[i + offset] = mem.Read((ushort)(begin + i));
                 }
 
                 File.WriteAllBytes(saveFileDialog1.FileName, buf);
@@ -315,6 +325,20 @@ namespace CPU6502
         {
             if (!cpu.run)
             {
+                if (cbStopAt.Checked)
+                {
+                    string working = txtStopAt.Text;
+                    if (working.StartsWith("0x"))
+                    {
+                        working = working.Substring(2);
+                    }
+                    cpu.StopAt = ushort.Parse(working,NumberStyles.HexNumber);
+                }
+                else
+                {
+                    cpu.StopAt = 0;
+                }
+
                 cpu.run = true;
                 CPUTask = Task.Run(cpu.Run);
                 UpdateTimer.Enabled = true;
@@ -327,6 +351,7 @@ namespace CPU6502
 
             if (!cpu.run && (CPUTask != null))
             {
+                UpdateStatusDisplay();
                 if (CPUTask.IsCompleted)
                 {
                     CPUTask.Dispose();
@@ -373,6 +398,11 @@ namespace CPU6502
         private void rb100M_CheckedChanged(object sender, EventArgs e)
         {
             if (rb100M.Checked) { cpu.OpCodePauseNanoseconds = 100000000; }
+        }
+
+        private void cbStopAt_CheckedChanged(object sender, EventArgs e)
+        {
+            txtStopAt.Enabled = cbStopAt.Checked;
         }
     }
 }

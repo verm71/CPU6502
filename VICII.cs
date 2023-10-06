@@ -17,7 +17,7 @@ namespace CPU6502
         byte CurrentRaster;
         public byte bank;
         int FramePauseNanoseconds = 10000;
-        Color[] palette = { Color.Black,Color.White  ,Color.Red,Color.Cyan,Color.Purple,Color.Green,Color.Blue,Color.Yellow,Color.Orange,Color.Brown,Color.Pink,Color.Gray,Color.DarkGray,Color.LightGreen,Color.LightBlue,Color.LightGray};
+        Color[] palette = { Color.Black, Color.White, Color.Red, Color.Cyan, Color.Purple, Color.Green, Color.Blue, Color.Yellow, Color.Orange, Color.Brown, Color.Pink, Color.Gray, Color.DarkGray, Color.LightGreen, Color.LightBlue, Color.LightGray };
 
         public ushort _BaseMemory
         {
@@ -48,12 +48,12 @@ namespace CPU6502
         byte VideoMatrixBaseAddress;
         byte CharacterDotDataBaseAddress;
 
-        public VICII(ref CIA1 Cia1, ref CIA2 Cia2, RAM ram)
+        public VICII(ref CIA1 Cia1, ref CIA2 Cia2, RAM Ram)
         {
-            Cia1 = cia1 = new CIA1(this);
-            Cia2 = cia2 = new CIA2(this);
+            Cia1 = cia1 = new CIA1(this,Ram);
+            Cia2 = cia2 = new CIA2(this,Ram);
 
-            mem = ram;
+            mem = Ram;
             display = new Display();
             display.Show();
             Task.Run(UpdateDisplay);
@@ -61,6 +61,8 @@ namespace CPU6502
 
         public void Write(ushort Addr, byte Value)
         {
+            mem._mem[Addr] = Value;
+
             switch (Addr)
             {
                 case 0xD016:
@@ -97,14 +99,14 @@ namespace CPU6502
             {
                 for (int c = 0; c < 40; c++)
                 {
-                    byte ch = mem._mem[(CurrentRaster / 8) * 40 + c];
+                    byte ch = mem._mem[(CurrentRaster / 8) * 40 + c + _VideoMatrixAddress];
 
                     byte bm = mem.CHARROM[ch * 8 + CurrentRaster % 8];
                     for (int b = 7; b >= 0; b--)
                     {
                         if ((bm & 0x01) != 0)
                         {
-                            scr.SetPixel(c * 8 + b, CurrentRaster, palette[mem._mem[(CurrentRaster / 8) * 40 + c+0xD800]]);
+                            scr.SetPixel(c * 8 + b, CurrentRaster, palette[mem._mem[(CurrentRaster / 8) * 40 + c + 0xD800]]);
                         }
                         else
                         {

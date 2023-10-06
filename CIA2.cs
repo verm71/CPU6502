@@ -10,6 +10,7 @@ namespace CPU6502
     internal class CIA2
     {
         public VICII vic;
+        RAM mem;
 
         // 00
         bool SerialBUSIn;
@@ -29,13 +30,15 @@ namespace CPU6502
         bool TimerBINT;
         bool TimerAINT;
 
-        public CIA2(VICII Vic)
+        public CIA2(VICII Vic,RAM Mem)
         {
             this.vic = Vic;
+            this.mem = Mem;
         }
 
         public void Write(ushort Addr, byte Value)
         {
+            mem._mem[Addr]= Value;
             switch (Addr & 0x000F)
             {
                 case 0x00:

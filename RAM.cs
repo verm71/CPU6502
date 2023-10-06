@@ -104,7 +104,7 @@ namespace CPU6502
 
                 if (page >= 0xD0 && page < 0xD4) // VIC-II
                 {
-                    vic.Write(addr, value);
+                    vic.Write(addr, value);                    
                 }
                 else if (page >= 0xD4 && page < 0xD8)
                 {
@@ -216,7 +216,7 @@ namespace CPU6502
                         }
                 }
             }
-            else if (page >= 0xD0 && page <= 223)
+            else if (page >= 0xD0 && page <= 0xDF)
             {
                 switch (MapMode[5])
                 {
