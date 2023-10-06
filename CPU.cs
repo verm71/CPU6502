@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,6 +50,7 @@ namespace CPU6502
 
         // *************************************************
         const byte ORA_IMM = 0X09;
+        const byte CLC = 0x18;
         const byte JSR = 0X20;
         const byte AND_IMM = 0x29;
         const byte ROL = 0x2A;
@@ -62,10 +64,12 @@ namespace CPU6502
         const byte STA_ABS = 0x8D;
         const byte STX_ABS = 0x8E;
         const byte STA_IND_Y = 0x91;
+        const byte TYA = 0x98;
         const byte STA_ABS_Y = 0x99;
         const byte TXS = 0x9A;
         const byte LDY_IMM = 0xA0;
         const byte LDX_IMM = 0XA2;
+        const byte LDY_ZP=0xA4;
         const byte TAY = 0xA8;
         const byte LDA_IMM = 0xA9;
         const byte TAX = 0xAA;
@@ -393,6 +397,26 @@ namespace CPU6502
                         F.Z= (A == 0);
                         break;
                     }
+                case TYA:
+                    {
+                        A = Y;
+                        F.N = (A & 0x80) != 0;
+                        F.Z = (A == 0);
+                        break;
+                    }
+                case LDY_ZP:
+                    {
+                        byte operand = mem.Read(PC++);
+                        Y = mem.Read(operand);
+                        F.Z = Y == 0;
+                        F.N = (Y & 0x80) != 0;
+                        break;
+                    }
+                case CLC:
+                    {
+                        F.C = false;
+                        break;
+                    }
                 case BCS_REL:
                     {
                         sbyte operand = (sbyte)(mem.Read(PC++));
@@ -601,6 +625,22 @@ namespace CPU6502
                 case TXA:
                     {
                         Assembler = "TXA";
+                        break;
+                    }
+                case TYA:
+                    {
+                        Assembler = "TYA";
+                        break;
+                    }
+                case LDY_ZP:
+                    {
+                        byte operand= (byte)(mem.Read((byte)(addr + 1)));
+                        Assembler = string.Format("LDY ${0:X4}",operand);
+                        break;
+                    }
+                case CLC:
+                    {
+                        Assembler = "CLC";
                         break;
                     }
                 case BCS_REL:
