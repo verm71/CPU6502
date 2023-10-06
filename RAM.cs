@@ -19,7 +19,7 @@ namespace CPU6502
         private byte[] KERNALROM = new byte[0x10000 - 0xe000];
         static readonly string KERNALROM_FILENAME = "ROMS\\kernal";
 
-        private byte[] CHARROM = new byte[0xe000 - 0xd000];
+        public byte[] CHARROM = new byte[0xe000 - 0xd000];
         static readonly string CHARROM_FILENAME = "ROMS\\chargen";
 
         Mapping[] MapMode;
@@ -115,7 +115,8 @@ namespace CPU6502
                 else if (page >= 0xD8 && page < 0xDC)
                 {
                     // COLOR RAM
-                    Debug.WriteLine(string.Format("CRAM write at {0:X4} value {1:X2}", addr, value));
+                    _mem[addr] = (byte)(value & 0x0F);
+                    //Debug.WriteLine(string.Format("CRAM write at {0:X4} value {1:X2}", addr, value));
 
                 }
                 else if (page >= 0xDC && page < 0xDD) // CIA1
@@ -229,7 +230,7 @@ namespace CPU6502
                         }
                     case Mapping.IO:
                         {
-                            return 0x00;   // not implemented
+                            return _mem[addr];    // not implemented
                         }
                 }
             }

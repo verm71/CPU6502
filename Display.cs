@@ -12,17 +12,18 @@ namespace CPU6502
 {
     public partial class Display : Form
     {
-        public Graphics? graphics;
+        public Graphics graphics;
 
         public Display()
         {
             InitializeComponent();
+
+            graphics = panel1.CreateGraphics();
         }
 
-        private void panel1_Paint(object sender, PaintEventArgs e)
+        private void Display_Load(object sender, EventArgs e)
         {
-            graphics ??= e.Graphics;
+            this.Left = Screen.GetBounds(new Point(this.Left, this.Top)).Width - this.Width ;
         }
-
     }
 }

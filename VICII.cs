@@ -16,6 +16,8 @@ namespace CPU6502
         Display display;
         byte CurrentRaster;
         public byte bank;
+        int FramePauseNanoseconds = 10000;
+        Color[] palette = { Color.Black,Color.White  ,Color.Red,Color.Cyan,Color.Purple,Color.Green,Color.Blue,Color.Yellow,Color.Orange,Color.Brown,Color.Pink,Color.Gray,Color.DarkGray,Color.LightGreen,Color.LightBlue,Color.LightGray};
 
         public ushort _BaseMemory
         {
@@ -48,8 +50,8 @@ namespace CPU6502
 
         public VICII(ref CIA1 Cia1, ref CIA2 Cia2, RAM ram)
         {
-            Cia1=cia1 = new CIA1(this);
-            Cia2=cia2 = new CIA2(this);
+            Cia1 = cia1 = new CIA1(this);
+            Cia2 = cia2 = new CIA2(this);
 
             mem = ram;
             display = new Display();
@@ -87,13 +89,44 @@ namespace CPU6502
 
         void UpdateDisplay()
         {
+            SolidBrush background = new(Color.Black);
+            Bitmap scr = new(320, 200);
+            Rectangle scale = new(0, 0, 1000, 800);
+
             while (!display.IsDisposed)
             {
-                
+                for (int c = 0; c < 40; c++)
+                {
+                    byte ch = mem._mem[(CurrentRaster / 8) * 40 + c];
+
+                    byte bm = mem.CHARROM[ch * 8 + CurrentRaster % 8];
+                    for (int b = 7; b >= 0; b--)
+                    {
+                        if ((bm & 0x01) != 0)
+                        {
+                            scr.SetPixel(c * 8 + b, CurrentRaster, palette[mem._mem[(CurrentRaster / 8) * 40 + c+0xD800]]);
+                        }
+                        else
+                        {
+                            scr.SetPixel(c * 8 + b, CurrentRaster, palette[mem._mem[0xD021]]);
+                        }
+                        bm >>= 1;
+                    }
+                }
 
                 CurrentRaster++;
                 CurrentRaster = (byte)(CurrentRaster % 200);
-                Thread.Sleep(1);
+
+                if (CurrentRaster == 0)
+                {
+                    display.graphics.DrawImage(scr, scale);
+                }
+
+                DateTime end = DateTime.Now + new TimeSpan(FramePauseNanoseconds / 100);
+                while (DateTime.Now < end)
+                {
+                    Thread.Yield();
+                }
             }
 
             Debug.WriteLine("Display thread stopped by disposal of screen.");

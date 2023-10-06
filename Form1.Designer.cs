@@ -312,6 +312,7 @@
             // 
             // txtLoadAt
             // 
+            txtLoadAt.Enabled = false;
             txtLoadAt.Location = new Point(488, 37);
             txtLoadAt.Margin = new Padding(2, 1, 2, 1);
             txtLoadAt.Name = "txtLoadAt";
@@ -593,6 +594,8 @@
             // cbUseHeader
             // 
             cbUseHeader.AutoSize = true;
+            cbUseHeader.Checked = true;
+            cbUseHeader.CheckState = CheckState.Checked;
             cbUseHeader.Location = new Point(569, 38);
             cbUseHeader.Margin = new Padding(2, 1, 2, 1);
             cbUseHeader.Name = "cbUseHeader";

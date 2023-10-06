@@ -281,10 +281,18 @@ namespace CPU6502
                 ushort begin = ushort.Parse(txtSaveFrom.Text, NumberStyles.HexNumber);
                 ushort end = ushort.Parse(txtSaveTo.Text, NumberStyles.HexNumber);
 
-                byte[] buf = new byte[end - begin + 1];
-                for (int i = 0; i < buf.Length; i++)
+                byte[] buf = new byte[end - begin + 3];  // include possible start address vector
+                
+                byte offset = (byte)(cbUseHeader.Checked ? 2 : 0);
+                if (cbUseHeader.Checked)
                 {
-                    buf[i] = mem.Read((ushort)(begin + i));
+                    buf[0]=(byte)(begin & 0xff);
+                    buf[1] = (byte)(begin >> 8);
+                }
+
+                for (int i = 0; i < buf.Length-offset; i++)
+                {
+                    buf[i+offset] = mem.Read((ushort)(begin + i));
                 }
 
                 File.WriteAllBytes(saveFileDialog1.FileName, buf);
