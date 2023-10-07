@@ -261,10 +261,11 @@ namespace CPU6502
 
                 for (int i = startRead; i < file.Length; i++)
                 {
-                    mem.Write((ushort)(value + i - startRead), file[i]);
+                    mem._mem[(ushort)(value + i - startRead)]= file[i];
                 }
 
-                UpdateDump();
+                cpu.PC = value;
+                UpdateStatusDisplay();
             }
         }
 
@@ -332,7 +333,7 @@ namespace CPU6502
                     {
                         working = working.Substring(2);
                     }
-                    cpu.StopAt = ushort.Parse(working,NumberStyles.HexNumber);
+                    cpu.StopAt = ushort.Parse(working, NumberStyles.HexNumber);
                 }
                 else
                 {
