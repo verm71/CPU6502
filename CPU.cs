@@ -67,11 +67,11 @@ namespace CPU6502
         const byte STA_ABS = 0x8D;
         const byte STX_ABS = 0x8E;
         const byte STA_IND_Y = 0x91;
-        const byte STY_ZP_X= 0x94;
+        const byte STY_ZP_X = 0x94;
         const byte TYA = 0x98;
         const byte STA_ABS_Y = 0x99;
         const byte TXS = 0x9A;
-        const byte STA_ABS_X= 0x9D;
+        const byte STA_ABS_X = 0x9D;
         const byte LDY_IMM = 0xA0;
         const byte LDX_IMM = 0XA2;
         const byte LDY_ZP = 0xA4;
@@ -179,7 +179,7 @@ namespace CPU6502
                     }
                 case LDA_ABS_X:
                     {
-                        ushort addr = (ushort)((mem.Read(PC++) + X) | (mem.Read(PC++) << 8));
+                        ushort addr = (ushort)(mem.Read(PC++) + (mem.Read(PC++) << 8) + X);
                         A = mem.Read(addr);
                         F.Z = (A == 0);
                         F.N = (A & 0x80) != 0;
@@ -188,7 +188,7 @@ namespace CPU6502
                     }
                 case CMP_ABS_X:
                     {
-                        byte operand = mem.Read((ushort)((mem.Read(PC++) + X) | (mem.Read(PC++) << 8)));
+                        byte operand = mem.Read((ushort)((mem.Read(PC++) + (mem.Read(PC++) << 8)) + X));
                         sbyte result = (sbyte)(A - operand);
                         F.Z = (result == 0);
                         F.N = (result & 0x80) != 0;
@@ -213,7 +213,7 @@ namespace CPU6502
                     }
                 case STX_ABS:
                     {
-                        ushort addr = (ushort)(mem.Read(PC++) | (mem.Read(PC++) << 8));
+                        ushort addr = (ushort)(mem.Read(PC++) + (mem.Read(PC++) << 8));
                         mem.Write(addr, X);
                         break;
                     }
@@ -361,7 +361,7 @@ namespace CPU6502
                 case CMP_IND_Y:
                     {
                         ushort operand = (ushort)(mem.Read(PC++));
-                        ushort addr = (ushort)(mem.Read(operand) + mem.Read((ushort)(operand + 1)) << 8);
+                        ushort addr = (ushort)(mem.Read(operand) + (mem.Read((ushort)(operand + 1)) << 8) + Y);
                         sbyte value = (sbyte)((sbyte)A - (sbyte)(mem.Read(addr)));
                         F.Z = (value == 0);
                         F.N = (value & 0x80) != 0;
@@ -431,7 +431,7 @@ namespace CPU6502
                     {
                         Y--;
                         F.Z = Y == 0;
-                        F.N= (Y & 0x80) != 0;
+                        F.N = (Y & 0x80) != 0;
                         break;
                     }
                 case BPL:
@@ -439,7 +439,7 @@ namespace CPU6502
                         sbyte operand = (sbyte)(mem.Read(PC++));
                         if (!F.N)
                         {
-                            PC = (ushort)(PC+ operand);
+                            PC = (ushort)(PC + operand);
                         }
                         break;
                     }
@@ -451,8 +451,8 @@ namespace CPU6502
                     }
                 case STY_ZP_X:
                     {
-                        ushort addr = (ushort)(mem.Read(PC++) + X);
-                        ushort lookup = (ushort)(mem.Read(addr) + mem.Read((ushort)(addr + 1))<<8);
+                        ushort addr = (ushort)((mem.Read(PC++) + X) % 0xFF);
+                        ushort lookup = (ushort)(mem.Read(addr) + mem.Read((ushort)(addr + 1)) << 8);
                         mem.Write(lookup, Y);
                         break;
                     }
@@ -687,8 +687,8 @@ namespace CPU6502
                     }
                 case BCS_REL:
                     {
-                        sbyte operand = (sbyte)mem.Read((ushort)(Addr+1));
-                        Assembler = string.Format("BCS ${0:X4}", Addr + operand+2);
+                        sbyte operand = (sbyte)mem.Read((ushort)(Addr + 1));
+                        Assembler = string.Format("BCS ${0:X4}", Addr + operand + 2);
                         break;
                     }
                 case DEY:
@@ -698,8 +698,8 @@ namespace CPU6502
                     }
                 case BPL:
                     {
-                        sbyte operand = (sbyte)mem.Read((ushort)(Addr+1));
-                        Assembler = string.Format("BPL ${0:X4}", Addr + operand+2);
+                        sbyte operand = (sbyte)mem.Read((ushort)(Addr + 1));
+                        Assembler = string.Format("BPL ${0:X4}", Addr + operand + 2);
                         break;
                     }
                 case STA_ABS_X:
@@ -710,8 +710,8 @@ namespace CPU6502
                     }
                 case STY_ZP_X:
                     {
-                        ushort addr = (ushort)(mem.Read((ushort)(Addr+1)) + X);
-                        ushort lookup = (ushort)(mem.Read(addr) + mem.Read((ushort)(addr + 1))<<8);
+                        ushort addr = (ushort)(mem.Read((ushort)(Addr + 1)) + X);
+                        ushort lookup = (ushort)(mem.Read(addr) + mem.Read((ushort)(addr + 1)) << 8);
                         Assembler = string.Format("STY ${0:X2},X  {1:X4}", addr + X, lookup);
                         break;
                     }
