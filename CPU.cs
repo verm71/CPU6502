@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
+using static CPU6502.RAM;
 
 namespace CPU6502
 {
@@ -42,10 +43,25 @@ namespace CPU6502
         RAM mem;
         byte OpCode;
         ushort LastFetchAddr;
-        ulong Cycles = 0;
+        //ulong Cycles = 0;
         public bool run = false;
         public ushort StopAt = 0;
         public int OpCodePauseNanoseconds = 100000;
+
+        public enum AddressingMode
+        {
+            ABS,
+            ABS_X,
+            ABS_Y,
+            IMM,
+            IND,
+            X_IND,
+            IND_Y,
+            REL,
+            ZP,
+            ZP_X,
+            ZP_Y
+        }
 
 
         // *************************************************
@@ -143,14 +159,97 @@ namespace CPU6502
             Debug.WriteLine(stopReason);
         }
 
+        public ushort GetAddress(ref ushort addr, AddressingMode Mode, bool IncrementAddress)
+        {
+            ushort retval = 0;
+
+            switch (Mode)
+            {
+                case AddressingMode.ABS:
+                    {
+                        retval = (ushort)(mem.Read(addr) + (mem.Read((ushort)(addr + 1)) << 8));
+                        if (IncrementAddress)
+                        {
+                            addr += 2;
+                        }
+                        break;
+                    }
+                case AddressingMode.REL:
+                    {
+                        sbyte offset = (sbyte)mem.Read(addr);
+                        retval = (ushort)(addr + 1 + offset);
+                        if (IncrementAddress)
+                        {
+                            addr++;
+                        }
+                        break;
+                    }
+                case AddressingMode.ZP:
+                    {
+                        retval = (ushort)(mem.Read(addr));
+                        if (IncrementAddress)
+                        {
+                            addr++;
+                        }
+                        break;
+                    }
+                default:
+                    {
+                        return 0;
+                    }
+            }
+
+            return retval;
+        }
+
+        public byte GetValue(ref ushort addr, AddressingMode Mode, bool IncrementAddress)
+        {
+            byte byteOperand;
+            int wordOperand;
+            ushort indirectAddress;
+
+            // for the operand
+            switch (Mode)
+            {
+                case AddressingMode.IMM:
+                    {
+                        byteOperand = mem.Read(addr);
+                        if (IncrementAddress)
+                        {
+                            addr++;
+                        }
+                        return byteOperand;
+                    }
+                case AddressingMode.ABS:
+                    {
+                        wordOperand = GetAddress(ref addr, Mode, IncrementAddress);
+
+                        return mem.Read(wordOperand);
+                    }
+                case AddressingMode.ABS_X:
+                    {
+                        wordOperand = GetAddress(ref PC, AddressingMode.ABS, IncrementAddress) + X;
+                        return mem.Read(wordOperand);
+                    }
+                default:
+                    {
+                        Debug.WriteLine("     ****");
+                        Debug.WriteLine("     **** Unimplemented addressing mode {0} for address {1:X4}.", Mode, addr);
+                        Debug.WriteLine("     ****");
+                        Console.Beep(250, 1000);
+                        run = false;
+                        return 0xFF;
+                    }
+            }
+        }
+
         public void Execute()
         {
             switch (OpCode)
             {
                 case LDX_IMM:
                     {
-                        this.X = mem.Read(PC++);
-                        Cycles += 2;
+                        this.X = GetValue(ref PC, AddressingMode.IMM, true);
                         this.F.Z = (X == 0);
                         this.F.N = (X & 0x80) != 0;
                         break;
@@ -174,13 +273,12 @@ namespace CPU6502
                     {
                         Push((byte)(((PC + 2) & 0xFF00) >> 8));
                         Push((byte)(((PC + 2) & 0x00FF)));
-                        PC = (ushort)(mem.Read(PC++) | (mem.Read(PC++) << 8));
+                        PC = GetAddress(ref PC, AddressingMode.ABS, true);
                         break;
                     }
                 case LDA_ABS_X:
                     {
-                        ushort addr = (ushort)(mem.Read(PC++) + (mem.Read(PC++) << 8));
-                        A = mem.Read((ushort)(addr+X));
+                        A = GetValue(ref PC, AddressingMode.ABS_X, true);
                         F.Z = (A == 0);
                         F.N = (A & 0x80) != 0;
 
@@ -188,7 +286,7 @@ namespace CPU6502
                     }
                 case CMP_ABS_X:
                     {
-                        byte operand = mem.Read((ushort)((mem.Read(PC++) + (mem.Read(PC++) << 8)) + X));
+                        byte operand = GetValue(ref PC, AddressingMode.ABS_X, true);
                         sbyte result = (sbyte)(A - operand);
                         F.Z = (result == 0);
                         F.N = (result & 0x80) != 0;
@@ -197,7 +295,8 @@ namespace CPU6502
                     }
                 case BNE_REL:
                     {
-                        ushort target = (ushort)(PC + 1 + (sbyte)mem.Read((ushort)(PC)));
+                        ushort target = GetAddress(ref PC, AddressingMode.REL, true);
+
                         PC++;
                         if (!F.Z)
                         {
@@ -213,8 +312,8 @@ namespace CPU6502
                     }
                 case STX_ABS:
                     {
-                        ushort addr = (ushort)(mem.Read(PC++) + (mem.Read(PC++) << 8));
-                        mem.Write(addr, X);
+                        int addr = GetAddress(ref PC, AddressingMode.ABS, true);
+                        mem.Write((ushort)addr, X);
                         break;
                     }
                 case DEX:
@@ -227,36 +326,34 @@ namespace CPU6502
                     }
                 case LDA_IMM:
                     {
-                        A = mem.Read(PC++);
-                        Cycles += 2;
+                        A = GetValue(ref PC, AddressingMode.IMM, true);
+                        //Cycles += 2;
                         this.F.Z = (A == 0);
                         this.F.N = (A & 0x80) != 0;
                         break;
                     }
                 case STA_ABS:
                     {
-                        ushort addr = (ushort)(mem.Read(PC++) | (mem.Read(PC++) << 8));
+                        ushort addr = GetAddress(ref PC, AddressingMode.ABS, true);
                         mem.Write(addr, A);
                         break;
                     }
                 case STA_ZP:
                     {
-                        byte zp = mem.Read(PC++);
+                        ushort zp = GetAddress(ref PC, AddressingMode.ZP, true);
                         mem.Write(zp, A);
                         break;
                     }
                 case LDA_ABS:
                     {
-                        ushort addr = (ushort)(mem.Read(PC++) | (mem.Read(PC++) << 8));
-                        A = mem.Read(addr);
+                        A = GetValue(ref PC, AddressingMode.ABS, true);
                         F.Z = (A == 0);
                         F.N = (A & 0x80) != 0;
                         break;
                     }
                 case BEQ_REL:
                     {
-                        ushort target = (ushort)(PC + 1 + (sbyte)mem.Read((ushort)(PC)));
-                        PC++;
+                        ushort target = GetAddress(ref PC, AddressingMode.REL, true);
                         if (F.Z)
                         {
                             PC = target;
@@ -452,7 +549,7 @@ namespace CPU6502
                 case STY_ZP_X:
                     {
                         ushort addr = (ushort)(mem.Read(PC++));
-                        mem.Write((ushort)(addr+X % 0xFF), Y);
+                        mem.Write((ushort)(addr + X % 0xFF), Y);
                         break;
                     }
                 default:

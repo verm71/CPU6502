@@ -80,7 +80,9 @@ namespace CPU6502
             Write(0, 0xff);
             Write(1, 0x1f);
 
-            vic = new VICII(ref cia1, ref cia2, this);
+#pragma warning disable CS8601 // Possible null reference assignment.
+            vic = new VICII(ref cia1, ref cia2, this); // VIC constructor will instantiate cia1 and cia2
+#pragma warning restore CS8601 // Possible null reference assignment.
 
             BASICROM = File.ReadAllBytes(BASICROM_FILENAME);
             KERNALROM = File.ReadAllBytes(KERNALROM_FILENAME);
@@ -104,7 +106,7 @@ namespace CPU6502
 
                 if (page >= 0xD0 && page < 0xD4) // VIC-II
                 {
-                    vic.Write(addr, value);                    
+                    vic.Write(addr, value);
                 }
                 else if (page >= 0xD4 && page < 0xD8)
                 {
@@ -145,7 +147,7 @@ namespace CPU6502
             }
         }
 
-        public byte Read(ushort addr)
+        public byte Read(int addr)
         {
             ushort page = (ushort)(addr >> 8);
 
