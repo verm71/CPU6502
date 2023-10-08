@@ -179,8 +179,8 @@ namespace CPU6502
                     }
                 case LDA_ABS_X:
                     {
-                        ushort addr = (ushort)(mem.Read(PC++) + (mem.Read(PC++) << 8) + X);
-                        A = mem.Read(addr);
+                        ushort addr = (ushort)(mem.Read(PC++) + (mem.Read(PC++) << 8));
+                        A = mem.Read((ushort)(addr+X));
                         F.Z = (A == 0);
                         F.N = (A & 0x80) != 0;
 
@@ -451,9 +451,8 @@ namespace CPU6502
                     }
                 case STY_ZP_X:
                     {
-                        ushort addr = (ushort)((mem.Read(PC++) + X) % 0xFF);
-                        ushort lookup = (ushort)(mem.Read(addr) + mem.Read((ushort)(addr + 1)) << 8);
-                        mem.Write(lookup, Y);
+                        ushort addr = (ushort)(mem.Read(PC++));
+                        mem.Write((ushort)(addr+X % 0xFF), Y);
                         break;
                     }
                 default:
