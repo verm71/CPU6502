@@ -200,7 +200,7 @@ namespace CPU6502
 
         private void btnStep_Click(object sender, EventArgs e)
         {
-            cpu.Fetch();
+            cpu.FetchOpCode();
             cpu.Execute();
 
             UpdateStatusDisplay();
@@ -261,7 +261,7 @@ namespace CPU6502
 
                 for (int i = startRead; i < file.Length; i++)
                 {
-                    mem._mem[(ushort)(value + i - startRead)]= file[i];
+                    mem._mem[(ushort)(value + i - startRead)] = file[i];
                 }
 
                 cpu.PC = value;
