@@ -165,37 +165,37 @@ namespace CPU6502
             {
                 case AddressingMode.ABS:
                     {
-                        return (ushort)(mem.Read(addr++) + (mem.Read(addr++) << 8));                    
+                        return (ushort)(mem.Read(addr++) + (mem.Read(addr++) << 8));
                     }
                 case AddressingMode.REL:
                     {
                         sbyte offset = (sbyte)mem.Read(addr++);
-                        return  (ushort)(addr + offset);                        
+                        return (ushort)(addr + offset);
                     }
                 case AddressingMode.ZP:
                     {
-                        return  (ushort)(mem.Read(addr++));                        
+                        return (ushort)(mem.Read(addr++));
                     }
                 case AddressingMode.ABS_X:
                     {
-                        return  (ushort)(mem.Read(addr++) + (mem.Read(addr++) << 8) + X);                        
+                        return (ushort)(mem.Read(addr++) + (mem.Read(addr++) << 8) + X);
                     }
                 case AddressingMode.ABS_Y:
                     {
-                        return (ushort)(mem.Read(addr++) + (mem.Read(addr++) << 8) + Y);                        
+                        return (ushort)(mem.Read(addr++) + (mem.Read(addr++) << 8) + Y);
                     }
                 case AddressingMode.IND_Y:
                     {
                         ushort zpAddress = (ushort)(mem.Read(addr++));
-                        return  (ushort)(FetchAddress(ref zpAddress, AddressingMode.ABS) + Y); // doesn't matter if zpAddress gets incremented                        
+                        return (ushort)(FetchAddress(ref zpAddress, AddressingMode.ABS) + Y); // doesn't matter if zpAddress gets incremented                        
                     }
                 case AddressingMode.ZP_X:
                     {
-                        return  (ushort)((mem.Read(addr++) + X) % 0xFF);                        
+                        return (ushort)((mem.Read(addr++) + X) % 0xFF);
                     }
                 case AddressingMode.ZP_Y:
                     {
-                        return  (ushort)((mem.Read(addr++) + Y) & 0xFF);                        
+                        return (ushort)((mem.Read(addr++) + Y) & 0xFF);
                     }
                 default:
                     {
@@ -210,18 +210,14 @@ namespace CPU6502
             }
         }
 
-        public byte GetValue(ref ushort addr, AddressingMode Mode, bool IncrementAddress)
+        public byte FetchValue(ref ushort addr, AddressingMode Mode)//, bool IncrementAddress)
         {
             // for the operand
             switch (Mode)
             {
                 case AddressingMode.IMM:
                     {
-                        byte byteOperand = mem.Read(addr);
-                        if (IncrementAddress)
-                        {
-                            addr++;
-                        }
+                        byte byteOperand = mem.Read(addr++);
                         return byteOperand;
                     }
                 default:
@@ -238,7 +234,7 @@ namespace CPU6502
             {
                 case LDX_IMM:
                     {
-                        this.X = GetValue(ref PC, AddressingMode.IMM, true);
+                        this.X = FetchValue(ref PC, AddressingMode.IMM);
                         this.F.Z = (X == 0);
                         this.F.N = (X & 0x80) != 0;
                         break;
@@ -267,7 +263,7 @@ namespace CPU6502
                     }
                 case LDA_ABS_X:
                     {
-                        A = GetValue(ref PC, AddressingMode.ABS_X, true);
+                        A = FetchValue(ref PC, AddressingMode.ABS_X);
                         F.Z = (A == 0);
                         F.N = (A & 0x80) != 0;
 
@@ -275,7 +271,7 @@ namespace CPU6502
                     }
                 case CMP_ABS_X:
                     {
-                        byte operand = GetValue(ref PC, AddressingMode.ABS_X, true);
+                        byte operand = FetchValue(ref PC, AddressingMode.ABS_X);
                         sbyte result = (sbyte)(A - operand);
                         F.Z = (result == 0);
                         F.N = (result & 0x80) != 0;
@@ -313,7 +309,7 @@ namespace CPU6502
                     }
                 case LDA_IMM:
                     {
-                        A = GetValue(ref PC, AddressingMode.IMM, true);
+                        A = FetchValue(ref PC, AddressingMode.IMM);
                         //Cycles += 2;
                         this.F.Z = (A == 0);
                         this.F.N = (A & 0x80) != 0;
@@ -333,7 +329,7 @@ namespace CPU6502
                     }
                 case LDA_ABS:
                     {
-                        A = GetValue(ref PC, AddressingMode.ABS, true);
+                        A = FetchValue(ref PC, AddressingMode.ABS);
                         F.Z = (A == 0);
                         F.N = (A & 0x80) != 0;
                         break;
@@ -356,7 +352,7 @@ namespace CPU6502
                     }
                 case AND_IMM:
                     {
-                        byte operand = GetValue(ref PC, AddressingMode.IMM, true);
+                        byte operand = FetchValue(ref PC, AddressingMode.IMM);
                         A = (byte)(A & operand);
                         F.Z = (A == 0);
                         F.N = (A & 0x80) != 0;
@@ -364,7 +360,7 @@ namespace CPU6502
                     }
                 case ORA_IMM:
                     {
-                        byte operand = GetValue(ref PC, AddressingMode.IMM, true);
+                        byte operand = FetchValue(ref PC, AddressingMode.IMM);
                         A = (byte)(A | operand);
                         F.Z = (A == 0);
                         F.N = (A & 0x80) != 0;
@@ -392,7 +388,7 @@ namespace CPU6502
                     }
                 case LDY_IMM:
                     {
-                        byte operand = GetValue(ref PC, AddressingMode.IMM, true);
+                        byte operand = FetchValue(ref PC, AddressingMode.IMM);
                         Y = operand;
                         F.N = (Y & 0x80) != 0;
                         F.Z = Y == 0;
@@ -400,13 +396,13 @@ namespace CPU6502
                     }
                 case STX_ZP:
                     {
-                        byte operand = GetValue(ref PC, AddressingMode.ZP, true);
+                        byte operand = FetchValue(ref PC, AddressingMode.ZP);
                         mem.Write((ushort)(operand), X);
                         break;
                     }
                 case STY_ZP:
                     {
-                        byte operand = GetValue(ref PC, AddressingMode.ZP, true);
+                        byte operand = FetchValue(ref PC, AddressingMode.ZP);
                         mem.Write((ushort)(operand), Y);
                         break;
                     }
@@ -421,7 +417,7 @@ namespace CPU6502
                     }
                 case LDA_IND_Y:
                     {
-                        A = GetValue(ref PC, AddressingMode.IND_Y, true);
+                        A = FetchValue(ref PC, AddressingMode.IND_Y);
                         F.Z = (A == 0);
                         F.N = (A & 0x80) != 0;
                         break;
@@ -441,7 +437,7 @@ namespace CPU6502
                     }
                 case CMP_IND_Y:
                     {
-                        sbyte value = (sbyte)(GetValue(ref PC, AddressingMode.IND_Y, true));
+                        sbyte value = (sbyte)(FetchValue(ref PC, AddressingMode.IND_Y));
                         sbyte cmp = (sbyte)((sbyte)A - value);
                         F.Z = (cmp == 0);
                         F.N = (cmp & 0x80) != 0;
@@ -473,7 +469,7 @@ namespace CPU6502
                     }
                 case LDY_ZP:
                     {
-                        Y = GetValue(ref PC, AddressingMode.ZP, true);
+                        Y = FetchValue(ref PC, AddressingMode.ZP);
                         F.Z = Y == 0;
                         F.N = (Y & 0x80) != 0;
                         break;
@@ -491,7 +487,7 @@ namespace CPU6502
                     }
                 case LDA_ABS_Y:
                     {
-                        A = GetValue(ref PC, AddressingMode.ABS_Y, true);
+                        A = FetchValue(ref PC, AddressingMode.ABS_Y);
                         F.Z = A == 0;
                         F.N = (A & 0x80) != 0;
                         break;
@@ -529,9 +525,8 @@ namespace CPU6502
                     }
                 case STY_ZP_X:
                     {
-                        //ushort addr = (ushort)(mem.Read(PC++));
                         ushort addr = FetchAddress(ref PC, AddressingMode.ZP_X);
-                        mem.Write((ushort)(addr + X % 0xFF), Y);
+                        mem.Write(addr, Y);
                         break;
                     }
                 default:
