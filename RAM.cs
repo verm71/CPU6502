@@ -149,39 +149,58 @@ namespace CPU6502
 
         public byte Read(int addr)
         {
-            ushort page = (ushort)(addr >> 8);
-
-            if (page >= 0x00 && page <= 15)
+            if (addr >= 0xE000)
             {
-                return _mem[addr];
-            }
-            else if (page >= 0x10 && page <= 127)
-            {
-                if (MapMode[1] == Mapping.MEM)
-                {
-                    return _mem[addr];
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-            else if (page >= 0x80 && page <= 159)
-            {
-                switch (MapMode[2])
+                switch (MapMode[6])
                 {
                     case Mapping.MEM:
                         {
                             return _mem[addr];
                         }
-                    case Mapping.CART_ROM_LO:
+                    case Mapping.ROM:
                         {
-                            return 0xF0;
-                            //throw new NotImplementedException("Cartridge ROM LO not implemented.");
+                            return KERNALROM[addr - 0xe000];
+                        }
+                    case Mapping.CART_ROM_HI:
+                        {
+                            return 0x0F;
+                            //throw new NotImplementedException("Cartridge ROM HI not implemented.");
                         }
                 }
             }
-            else if (page >= 0xA0 && page <= 191)
+            else if (addr >= 0xD000)
+            {
+                switch (MapMode[5])
+                {
+                    case Mapping.MEM:
+                        {
+                            return _mem[addr];
+                        }
+                    case Mapping.ROM:
+                        {
+                            return CHARROM[addr - 0xd000];
+                        }
+                    case Mapping.IO:
+                        {
+                            return _mem[addr];    // not implemented
+                        }
+                }
+            }
+            else if (addr >= 0xC000)
+            {
+                switch (MapMode[4])
+                {
+                    case Mapping.MEM:
+                        {
+                            return _mem[addr];
+                        }
+                    case Mapping.NOMAP:
+                        {
+                            return 0xFF;
+                        }
+                }
+            }
+            else if (addr >= 0xA000)
             {
                 switch (MapMode[3])
                 {
@@ -204,59 +223,25 @@ namespace CPU6502
                         }
                 }
             }
-            else if (page >= 0xC0 && page <= 207)
+            else if (addr >= 0x8000)
             {
-                switch (MapMode[4])
+                switch (MapMode[2])
                 {
                     case Mapping.MEM:
                         {
                             return _mem[addr];
                         }
-                    case Mapping.NOMAP:
+                    case Mapping.CART_ROM_LO:
                         {
-                            return 0xFF;
+                            return 0xF0;
+                            //throw new NotImplementedException("Cartridge ROM LO not implemented.");
                         }
                 }
             }
-            else if (page >= 0xD0 && page <= 0xDF)
-            {
-                switch (MapMode[5])
-                {
-                    case Mapping.MEM:
-                        {
-                            return _mem[addr];
-                        }
-                    case Mapping.ROM:
-                        {
-                            return CHARROM[addr - 0xd000];
-                        }
-                    case Mapping.IO:
-                        {
-                            return _mem[addr];    // not implemented
-                        }
-                }
-            }
-            else if (page >= 0xE0 && page <= 255)
-            {
-                switch (MapMode[6])
-                {
-                    case Mapping.MEM:
-                        {
-                            return _mem[addr];
-                        }
-                    case Mapping.ROM:
-                        {
-                            return KERNALROM[addr - 0xe000];
-                        }
-                    case Mapping.CART_ROM_HI:
-                        {
-                            return 0x0F;
-                            //throw new NotImplementedException("Cartridge ROM HI not implemented.");
-                        }
-                }
-            }
+            
+            return _mem[addr];
 
-            throw new Exception(string.Format("Unsupported memory map mode {0:X2} for address {1:X4}", _mem[1], addr));
+            //throw new Exception(string.Format("Unsupported memory map mode {0:X2} for address {1:X4}", _mem[1], addr));
         }
     }
 }
