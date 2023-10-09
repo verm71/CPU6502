@@ -122,7 +122,7 @@ namespace CPU6502
             PC = (ushort)(mem.Read(0xfffc) + (mem.Read(0xfffd) << 8));
         }
 
-        public void Fetch()
+        public void FetchOpCode()
         {
             LastFetchAddr = PC;
             OpCode = mem.Read(PC++);
@@ -144,7 +144,7 @@ namespace CPU6502
 
             while (run)
             {
-                Fetch();
+                FetchOpCode();
                 Execute();
 
                 DateTime end = DateTime.Now + new TimeSpan(OpCodePauseNanoseconds / 100);
@@ -159,80 +159,55 @@ namespace CPU6502
             Debug.WriteLine(stopReason);
         }
 
-        public ushort GetAddress(ref ushort addr, AddressingMode Mode, bool IncrementAddress)
+        public ushort FetchAddress(ref ushort addr, AddressingMode Mode)//, bool IncrementAddress)
         {
-            ushort retval = 0;
-
             switch (Mode)
             {
                 case AddressingMode.ABS:
                     {
-                        retval = (ushort)(mem.Read(addr) + (mem.Read((ushort)(addr + 1)) << 8));
-                        if (IncrementAddress)
-                        {
-                            addr += 2;
-                        }
-                        break;
+                        return (ushort)(mem.Read(addr++) + (mem.Read(addr++) << 8));                    
                     }
                 case AddressingMode.REL:
                     {
-                        sbyte offset = (sbyte)mem.Read(addr);
-                        retval = (ushort)(addr + 1 + offset);
-                        if (IncrementAddress)
-                        {
-                            addr++;
-                        }
-                        break;
+                        sbyte offset = (sbyte)mem.Read(addr++);
+                        return  (ushort)(addr + offset);                        
                     }
                 case AddressingMode.ZP:
                     {
-                        retval = (ushort)(mem.Read(addr));
-                        if (IncrementAddress)
-                        {
-                            addr++;
-                        }
-                        break;
+                        return  (ushort)(mem.Read(addr++));                        
                     }
                 case AddressingMode.ABS_X:
                     {
-                        retval = (ushort)(mem.Read(addr) + (mem.Read((ushort)(addr + 1)) << 8) + X);
-                        if (IncrementAddress)
-                        {
-                            addr += 2;
-                        }
-                        break;
+                        return  (ushort)(mem.Read(addr++) + (mem.Read(addr++) << 8) + X);                        
                     }
                 case AddressingMode.ABS_Y:
                     {
-                        retval = (ushort)(mem.Read(addr) + (mem.Read((ushort)(addr + 1)) << 8) + Y);
-                        if (IncrementAddress)
-                        {
-                            addr += 2;
-                        }
-                        break;
+                        return (ushort)(mem.Read(addr++) + (mem.Read(addr++) << 8) + Y);                        
                     }
                 case AddressingMode.IND_Y:
                     {
-                        ushort zpAddress = (ushort)(mem.Read(addr));
-                        retval = (ushort)(GetAddress(ref zpAddress, AddressingMode.ABS, false) + Y);
-                        if (IncrementAddress)
-                        {
-                            addr += 1;
-                        }
-                        break;
+                        ushort zpAddress = (ushort)(mem.Read(addr++));
+                        return  (ushort)(FetchAddress(ref zpAddress, AddressingMode.ABS) + Y); // doesn't matter if zpAddress gets incremented                        
+                    }
+                case AddressingMode.ZP_X:
+                    {
+                        return  (ushort)((mem.Read(addr++) + X) % 0xFF);                        
+                    }
+                case AddressingMode.ZP_Y:
+                    {
+                        return  (ushort)((mem.Read(addr++) + Y) & 0xFF);                        
                     }
                 default:
                     {
                         Debug.WriteLine("     ****");
                         Debug.WriteLine("     **** Unimplemented addressing mode {0} for address {1:X4}.", Mode, addr);
                         Debug.WriteLine("     ****");
-                        Console.Beep(250, 1000);
+                        Console.Beep(250, 100);
+                        Console.Beep(250, 100);
                         run = false;
                         return 0xFF;
                     }
             }
-
-            return retval;
         }
 
         public byte GetValue(ref ushort addr, AddressingMode Mode, bool IncrementAddress)
@@ -251,7 +226,7 @@ namespace CPU6502
                     }
                 default:
                     {
-                        int wordOperand = GetAddress(ref addr, Mode, IncrementAddress);
+                        int wordOperand = FetchAddress(ref addr, Mode);
                         return mem.Read(wordOperand);
                     }
             }
@@ -287,7 +262,7 @@ namespace CPU6502
                     {
                         Push((byte)(((PC + 2) & 0xFF00) >> 8));
                         Push((byte)(((PC + 2) & 0x00FF)));
-                        PC = GetAddress(ref PC, AddressingMode.ABS, true);
+                        PC = FetchAddress(ref PC, AddressingMode.ABS);
                         break;
                     }
                 case LDA_ABS_X:
@@ -309,7 +284,7 @@ namespace CPU6502
                     }
                 case BNE_REL:
                     {
-                        ushort target = GetAddress(ref PC, AddressingMode.REL, true);
+                        ushort target = FetchAddress(ref PC, AddressingMode.REL);
                         if (!F.Z)
                         {
                             PC = target;
@@ -324,7 +299,7 @@ namespace CPU6502
                     }
                 case STX_ABS:
                     {
-                        int addr = GetAddress(ref PC, AddressingMode.ABS, true);
+                        int addr = FetchAddress(ref PC, AddressingMode.ABS);
                         mem.Write((ushort)addr, X);
                         break;
                     }
@@ -346,13 +321,13 @@ namespace CPU6502
                     }
                 case STA_ABS:
                     {
-                        ushort addr = GetAddress(ref PC, AddressingMode.ABS, true);
+                        ushort addr = FetchAddress(ref PC, AddressingMode.ABS);
                         mem.Write(addr, A);
                         break;
                     }
                 case STA_ZP:
                     {
-                        ushort zp = GetAddress(ref PC, AddressingMode.ZP, true);
+                        ushort zp = FetchAddress(ref PC, AddressingMode.ZP);
                         mem.Write(zp, A);
                         break;
                     }
@@ -365,7 +340,7 @@ namespace CPU6502
                     }
                 case BEQ_REL:
                     {
-                        ushort target = GetAddress(ref PC, AddressingMode.REL, true);
+                        ushort target = FetchAddress(ref PC, AddressingMode.REL);
                         if (F.Z)
                         {
                             PC = target;
@@ -375,7 +350,7 @@ namespace CPU6502
                     }
                 case JMP_ABS:
                     {
-                        ushort target = GetAddress(ref PC, AddressingMode.ABS, true);//(ushort)(mem.Read(PC++) | (mem.Read(PC++) << 8));
+                        ushort target = FetchAddress(ref PC, AddressingMode.ABS);
                         PC = target;
                         break;
                     }
@@ -404,7 +379,7 @@ namespace CPU6502
                     }
                 case STA_ABS_Y:
                     {
-                        ushort addr = GetAddress(ref PC, AddressingMode.ABS_Y, true);
+                        ushort addr = FetchAddress(ref PC, AddressingMode.ABS_Y);
                         mem.Write(addr, A);
                         break;
                     }
@@ -437,8 +412,8 @@ namespace CPU6502
                     }
                 case INC_ZP:
                     {
-                        ushort address = GetAddress(ref PC, AddressingMode.ZP, true); // need to retain address
-                        byte value = (byte)(GetValue(ref address, AddressingMode.IMM, false) + 1);// (byte)(mem.Read(address) + 1);
+                        ushort address = FetchAddress(ref PC, AddressingMode.ZP); // need to retain address
+                        byte value = (byte)(mem.Read(address) + 1); // don't use GetValue as it inteprets the address as an operand
                         mem.Write(address, value);
                         F.Z = (value == 0);
                         F.N = (value & 0x80) != 0;
@@ -446,9 +421,7 @@ namespace CPU6502
                     }
                 case LDA_IND_Y:
                     {
-                        //ushort operand = (ushort)(mem.Read(PC++));
-                        //ushort addr = (ushort)(mem.Read(operand) + mem.Read((ushort)(operand + 1)) << 8);
-                        A = GetValue(ref PC, AddressingMode.IND_Y, true);// mem.Read((ushort)(addr + Y));
+                        A = GetValue(ref PC, AddressingMode.IND_Y, true);
                         F.Z = (A == 0);
                         F.N = (A & 0x80) != 0;
                         break;
@@ -462,19 +435,17 @@ namespace CPU6502
                     }
                 case STA_IND_Y:
                     {
-                        ushort operand = (ushort)(mem.Read(PC++));
-                        ushort addr = (ushort)(mem.Read(operand) + mem.Read((ushort)(operand + 1)) << 8);
-                        mem.Write((ushort)(addr + Y), A);
+                        ushort addr = FetchAddress(ref PC, AddressingMode.IND_Y);
+                        mem.Write((ushort)(addr), A);
                         break;
                     }
                 case CMP_IND_Y:
                     {
-                        ushort operand = (ushort)(mem.Read(PC++));
-                        ushort addr = (ushort)(mem.Read(operand) + (mem.Read((ushort)(operand + 1)) << 8) + Y);
-                        sbyte value = (sbyte)((sbyte)A - (sbyte)(mem.Read(addr)));
-                        F.Z = (value == 0);
-                        F.N = (value & 0x80) != 0;
-                        F.C = mem.Read(addr) > A;
+                        sbyte value = (sbyte)(GetValue(ref PC, AddressingMode.IND_Y, true));
+                        sbyte cmp = (sbyte)((sbyte)A - value);
+                        F.Z = (cmp == 0);
+                        F.N = (cmp & 0x80) != 0;
+                        F.C = value > A;
                         break;
                     }
                 case ROL:
@@ -502,8 +473,7 @@ namespace CPU6502
                     }
                 case LDY_ZP:
                     {
-                        byte operand = mem.Read(PC++);
-                        Y = mem.Read(operand);
+                        Y = GetValue(ref PC, AddressingMode.ZP, true);
                         F.Z = Y == 0;
                         F.N = (Y & 0x80) != 0;
                         break;
@@ -515,24 +485,23 @@ namespace CPU6502
                     }
                 case STY_ABS:
                     {
-                        ushort addr = (ushort)(mem.Read(PC++) + ((mem.Read(PC++) << 8)));
+                        ushort addr = FetchAddress(ref PC, AddressingMode.ABS);
                         mem.Write(addr, Y);
                         break;
                     }
                 case LDA_ABS_Y:
                     {
-                        ushort addr = (ushort)(mem.Read(PC++) + ((mem.Read(PC++) << 8)));
-                        A = mem.Read((ushort)(addr + Y));
+                        A = GetValue(ref PC, AddressingMode.ABS_Y, true);
                         F.Z = A == 0;
                         F.N = (A & 0x80) != 0;
                         break;
                     }
                 case BCS_REL:
                     {
-                        sbyte operand = (sbyte)(mem.Read(PC++));
+                        ushort addr = FetchAddress(ref PC, AddressingMode.REL);
                         if (F.C)
                         {
-                            PC = (ushort)(PC + operand);
+                            PC = addr;
                         }
                         break;
                     }
@@ -545,22 +514,23 @@ namespace CPU6502
                     }
                 case BPL:
                     {
-                        sbyte operand = (sbyte)(mem.Read(PC++));
+                        ushort addr = FetchAddress(ref PC, AddressingMode.REL);
                         if (!F.N)
                         {
-                            PC = (ushort)(PC + operand);
+                            PC = addr;
                         }
                         break;
                     }
                 case STA_ABS_X:
                     {
-                        ushort addr = (ushort)(mem.Read(PC++) + (mem.Read(PC++) << 8));
-                        mem.Write((ushort)(addr + X), A);
+                        ushort addr = FetchAddress(ref PC, AddressingMode.ABS_X);
+                        mem.Write(addr, A);
                         break;
                     }
                 case STY_ZP_X:
                     {
-                        ushort addr = (ushort)(mem.Read(PC++));
+                        //ushort addr = (ushort)(mem.Read(PC++));
+                        ushort addr = FetchAddress(ref PC, AddressingMode.ZP_X);
                         mem.Write((ushort)(addr + X % 0xFF), Y);
                         break;
                     }
