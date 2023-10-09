@@ -615,7 +615,7 @@ namespace CPU6502
             {
                 case LDX_IMM:
                     {
-                        Assembler = String.Format("LDX #{0:X2}", mem.Read((ushort)(Addr + 1)));
+                        Assembler = String.Format("{1} #{0:X2}", mem.Read((ushort)(Addr + 1)),OpCode);
                         break;
                     }
                 case SEI:
@@ -855,7 +855,7 @@ namespace CPU6502
                         break;
                     }
             }
-
+            
             return Assembler;
 
         }
