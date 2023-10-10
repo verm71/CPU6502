@@ -201,8 +201,15 @@ namespace CPU6502
 
         private void btnStep_Click(object sender, EventArgs e)
         {
-            cpu.FetchOpCode();
-            cpu.Execute();
+            if (cpu.run)
+            {
+                cpu.run = false;
+            }
+            else
+            {
+                cpu.FetchOpCode();
+                cpu.Execute();
+            }
 
             UpdateStatusDisplay();
         }

@@ -92,6 +92,7 @@ namespace CPU6502
 
         public void Write(ushort addr, byte value)
         {
+            // BUG: We're not respecting memory mapping!!
             if (cpu !=null && addr == cpu.StopAtMemoryWrite)
             {
                 cpu.run = false;

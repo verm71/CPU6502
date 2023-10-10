@@ -23,7 +23,7 @@ namespace CPU6502
         {
             get
             {
-                return (ushort)(bank * 0x4000);
+                return (ushort)((3-bank) * 0x4000);
             }
         }
         public ushort _VideoMatrixAddress
@@ -76,7 +76,7 @@ namespace CPU6502
 
                 case 0xD018:
                     {
-                        VideoMatrixBaseAddress = (byte)((Value & 0xF0) >> 4);
+                        VideoMatrixBaseAddress = (byte)(Value & 0xF0) ;
                         CharacterDotDataBaseAddress = (byte)(Value & 0x0E);
                         break;
                     }
@@ -94,12 +94,14 @@ namespace CPU6502
             SolidBrush background = new(Color.Black);
             Bitmap scr = new(320, 200);
             Rectangle scale = new(0, 0, 1000, 800);
-
+            
             while (!display.IsDisposed)
             {
+                int videoAddress = _VideoMatrixAddress;
+
                 for (int c = 0; c < 40; c++)
                 {
-                    byte ch = mem._mem[(CurrentRaster / 8) * 40 + c + _VideoMatrixAddress];
+                    byte ch = mem._mem[(CurrentRaster / 8) * 40 + c + videoAddress];
 
                     byte bm = mem.CHARROM[ch * 8 + CurrentRaster % 8];
                     for (int b = 7; b >= 0; b--)

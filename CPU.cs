@@ -403,12 +403,12 @@ namespace CPU6502
                     }
                 case opCodes.STX_ZP:
                     {
-                        mem.Write((ushort)(FetchValue(ref PC, AddressingMode.ZP)), X);
+                        mem.Write((ushort)(FetchAddress(ref PC, AddressingMode.ZP)), X);
                         break;
                     }
                 case opCodes.STY_ZP:
                     {
-                        mem.Write((ushort)(FetchValue(ref PC, AddressingMode.ZP)), Y);
+                        mem.Write((ushort)(FetchAddress(ref PC, AddressingMode.ZP)), Y);
                         break;
                     }
                 case opCodes.INC_ZP:
@@ -691,6 +691,7 @@ namespace CPU6502
                 case opCodes.LDA_ABS:
                 case opCodes.JMP_ABS:
                 case opCodes.STY_ABS:
+                case opCodes.ORA_ABS:
                     {
                         Assembler += DisassembleOperand(Addr + 1, AddressingMode.ABS);
                         break;
@@ -726,6 +727,7 @@ namespace CPU6502
                 case opCodes.INC_ZP:
                 case opCodes.LDY_ZP:
                 case opCodes.LDX_ZP:
+                case opCodes.LDA_ZP:
                     {
                         Assembler += DisassembleOperand(Addr + 1, AddressingMode.ZP);
                         break;
@@ -747,13 +749,14 @@ namespace CPU6502
                 case opCodes.CMP_IND_Y:
                     {
                         Assembler += DisassembleOperand(Addr + 1, AddressingMode.IND_Y);
+
                         break;
                     }
-
 
                 // ZP_X
                 case opCodes.STY_ZP_X:
                 case opCodes.LDY_ZP_X:
+                case opCodes.LDA_ZP_X:
                     {
                         Assembler += DisassembleOperand(Addr + 1, AddressingMode.ZP_X);
                         break;
@@ -792,7 +795,7 @@ namespace CPU6502
                     }
                 case AddressingMode.ZP:
                     {
-                        return string.Format(" ${0:X2}", mem.Read(Addr + 1));
+                        return string.Format(" ${0:X2}", mem.Read(Addr));
                     }
                 case AddressingMode.REL:
                     {
