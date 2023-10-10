@@ -63,8 +63,6 @@ namespace CPU6502
             ZP_Y
         }
 
-
-        // *************************************************
         enum opCodes : byte
         {
             ORA_IMM = 0x09,
@@ -74,6 +72,7 @@ namespace CPU6502
             JSR = 0X20,
             AND_IMM = 0x29,
             ROL = 0x2A,
+            BMI_REL = 0x30,
             JMP_ABS = 0x4C,
             RTS = 0x60,
             ADC_IMM = 0x69,
@@ -98,12 +97,14 @@ namespace CPU6502
             LDX_IMM = 0XA2,
             LDY_ZP = 0xA4,
             LDA_ZP = 0xA5,
+            LDX_ZP = 0xA6,
             TAY = 0xA8,
             LDA_IMM = 0xA9,
             TAX = 0xAA,
             LDA_ABS = 0xAD,
             BCS_REL = 0xB0,
             LDA_IND_Y = 0xB1,
+            LDY_ZP_X = 0xB4,
             LDA_ZP_X = 0xB5,
             LDA_ABS_Y = 0xB9,
             LDA_ABS_X = 0xBD,
@@ -118,7 +119,6 @@ namespace CPU6502
             INX = 0xE8,
             BEQ_REL = 0xF0
         }
-        // *************************************************
 
         public CPU(RAM m)
         {
@@ -598,6 +598,32 @@ namespace CPU6502
                         F.N = (A & 0x80) != 0;
                         break;
                     }
+                case opCodes.LDX_ZP:
+                    {
+                        X = FetchValue(ref PC, AddressingMode.ZP);
+                        F.Z = (X == 0);
+                        F.N = (X & 0x80) != 0;
+                        break;
+                    }
+                case opCodes.LDY_ZP_X:
+                    {
+                        Y = FetchValue(ref PC, AddressingMode.ZP_X);
+                        F.Z = (Y == 0);
+                        F.N = (Y & 0x80) != 0;
+                        break;
+                    }
+                case opCodes.BMI_REL:
+                    {
+                        if (F.N)
+                        {
+                            PC = FetchAddress(ref PC, AddressingMode.REL);
+                        }
+                        else
+                        {
+                            PC++;
+                        }
+                        break;
+                    }
                 default:
                     {
                         Debug.WriteLine(String.Format("**** {1:X4}: OP Code {0:X2} not implemented.", (byte)OpCode, LastFetchAddr));
@@ -609,258 +635,186 @@ namespace CPU6502
             }
         }
 
-        public string Disassemble(ushort Addr)
+        public string Disassemble(int Addr)
         {
             opCodes OpCode = (opCodes)mem.Read(Addr);
-            string Assembler = String.Format("??? {0:X2} {1:X2} {2:X2}", (byte)OpCode, mem.Read((ushort)(Addr + 1)), mem.Read((ushort)(Addr + 2)));
+            string Assembler;
+
+            try // might throw if opcode not supported
+            {
+                Assembler = OpCode.ToString().Substring(0, 3);
+            }
+            catch
+            {
+                Assembler = "";
+            }
 
             switch (OpCode)
             {
+                // IMM
                 case opCodes.LDX_IMM:
-                    {
-                        Assembler = String.Format("LDX #{0:X2}", mem.Read((ushort)(Addr + 1)));
-                        break;
-                    }
-                case opCodes.SEI:
-                    {
-                        Assembler = "SEI";
-                        break;
-                    }
-                case opCodes.TXS:
-                    {
-                        Assembler = "TXS";
-                        break;
-                    }
-                case opCodes.CLD:
-                    {
-                        Assembler = "CLD";
-                        break;
-                    }
-                case opCodes.JSR:
-                    {
-                        Assembler = String.Format("JSR ${0:X4}", mem.Read((ushort)(Addr + 1)) | (mem.Read((ushort)(Addr + 2)) << 8));
-                        break;
-                    }
-                case opCodes.LDA_ABS_X:
-                    {
-                        ushort operand = (ushort)(mem.Read((ushort)(Addr + 1)) | (mem.Read((ushort)(Addr + 2)) << 8));
-                        Assembler = string.Format("LDA ${0:X4}+X  ${1:X4}", operand, operand + X);
-                        break;
-                    }
-                case opCodes.CMP_ABS_X:
-                    {
-                        ushort operand = (ushort)(mem.Read((ushort)(Addr + 1)) | (mem.Read((ushort)(Addr + 2)) << 8));
-                        Assembler = string.Format("CMP ${0:X4}+X  ${1:X4}", operand, operand + X);
-                        break;
-                    }
-                case opCodes.BNE_REL:
-                    {
-                        sbyte rel = (sbyte)mem.Read((ushort)(Addr + 1));
-                        Assembler = String.Format("BNE {0:X4}", Addr + 2 + rel);
-                        break;
-                    }
-                case opCodes.RTS:
-                    {
-                        Assembler = "RTS";
-                        break;
-                    }
-                case opCodes.STX_ABS:
-                    {
-                        ushort operand = (ushort)(mem.Read((ushort)(Addr + 1)) | (mem.Read((ushort)(Addr + 2)) << 8));
-                        Assembler = string.Format("STX ${0:X4}", operand);
-                        break;
-                    }
-                case opCodes.DEX:
-                    {
-                        Assembler = "DEX";
-                        break;
-                    }
                 case opCodes.LDA_IMM:
-                    {
-                        byte operand = mem.Read((ushort)(Addr + 1));
-                        Assembler = string.Format("LDA #{0:X2}", operand);
-                        break;
-                    }
-                case opCodes.STA_ABS:
-                    {
-                        ushort operand = (ushort)(mem.Read((ushort)(Addr + 1)) | (mem.Read((ushort)(Addr + 2)) << 8));
-                        Assembler = string.Format("STA ${0:X4}", operand);
-                        break;
-                    }
-                case opCodes.STA_ZP:
-                    {
-                        byte zp = mem.Read((ushort)(Addr + 1));
-                        Assembler = string.Format("STA ${0:X2}", zp);
-                        break;
-                    }
-                case opCodes.LDA_ABS:
-                    {
-                        ushort operand = (ushort)(mem.Read((ushort)(Addr + 1)) | (mem.Read((ushort)(Addr + 2)) << 8));
-                        Assembler = string.Format("LDA ${0:X4}", operand);
-                        break;
-                    }
-                case opCodes.BEQ_REL:
-                    {
-                        sbyte rel = (sbyte)mem.Read((ushort)(Addr + 1));
-                        Assembler = String.Format("BEQ {0:X4}", Addr + 2 + rel);
-                        break;
-                    }
-                case opCodes.JMP_ABS:
-                    {
-                        ushort target = (ushort)(mem.Read((ushort)(Addr + 1)) | (mem.Read((ushort)(Addr + 2)) << 8));
-                        Assembler = string.Format("JMP ${0:X4}", target);
-                        break;
-                    }
                 case opCodes.AND_IMM:
-                    {
-                        byte operand = mem.Read((ushort)(Addr + 1));
-                        Assembler = string.Format("AND #{0:X2}", operand);
-                        break;
-                    }
                 case opCodes.ORA_IMM:
-                    {
-                        byte operand = mem.Read((ushort)(Addr + 1));
-                        Assembler = string.Format("ORA #{0:X2}", operand);
-                        break;
-                    }
-                case opCodes.TAY:
-                    {
-                        Assembler = "TAY";
-                        break;
-                    }
-                case opCodes.STA_ABS_Y:
-                    {
-                        ushort operand = (ushort)(mem.Read((ushort)(Addr + 1)) + (mem.Read((ushort)(Addr + 2)) << 8));
-                        Assembler = string.Format("STA ${0:X4}+Y  {1:X4}", operand, operand + Y);
-                        break;
-                    }
-                case opCodes.INY:
-                    {
-                        Assembler = "INY";
-                        break;
-                    }
                 case opCodes.LDY_IMM:
                     {
-                        byte operand = mem.Read((ushort)(Addr + 1));
-                        Assembler = string.Format("LDY #{0:X2}", operand);
+                        Assembler += DisassembleOperand(Addr + 1, AddressingMode.IMM);
                         break;
                     }
-                case opCodes.STX_ZP:
-                    {
-                        byte operand = mem.Read((ushort)(Addr + 1));
-                        Assembler = string.Format("STX {0:X4}", operand);
-                        break;
-                    }
-                case opCodes.STY_ZP:
-                    {
-                        byte operand = mem.Read((ushort)(Addr + 1));
-                        Assembler = string.Format("STY {0:X4}", operand);
-                        break;
-                    }
-                case opCodes.INC_ZP:
-                    {
-                        byte operand = mem.Read((ushort)(Addr + 1));
-                        Assembler = string.Format("INC {0:X4}", operand);
-                        break;
-                    }
-                case opCodes.LDA_IND_Y:
-                    {
-                        ushort operand = (ushort)(mem.Read((ushort)(Addr + 1)));
-                        ushort address = (ushort)(mem.Read(operand) + mem.Read((ushort)(operand + 1)) << 8);
-                        Assembler = string.Format("LDA ({0:X2}),Y  {1:X4}", operand, address + Y);
-                        break;
-                    }
+
+
+                // IMP
+                case opCodes.SEI:
+                case opCodes.TXS:
+                case opCodes.CLD:
+                case opCodes.RTS:
+                case opCodes.DEX:
+                case opCodes.TAY:
+                case opCodes.INY:
                 case opCodes.TAX:
-                    {
-                        Assembler = "TAX";
-                        break;
-                    }
-                case opCodes.STA_IND_Y:
-                    {
-                        ushort operand = (ushort)(mem.Read((ushort)(Addr + 1)));
-                        ushort address = (ushort)(mem.Read(operand) + mem.Read((ushort)(operand + 1)) << 8);
-                        Assembler = string.Format("STA ({0:X2}),Y  {1:X4}", operand, address);
-                        break;
-                    }
-                case opCodes.CMP_IND_Y:
-                    {
-                        ushort operand = (ushort)(mem.Read((ushort)(Addr + 1)));
-                        ushort address = (ushort)(mem.Read(operand) + mem.Read((ushort)(operand + 1)) << 8);
-                        Assembler = string.Format("CMP ({0:X2}),Y  {1:X4}", operand, address);
-                        break;
-                    }
                 case opCodes.ROL:
-                    {
-                        Assembler = "ROL";
-                        break;
-                    }
                 case opCodes.TXA:
-                    {
-                        Assembler = "TXA";
-                        break;
-                    }
                 case opCodes.TYA:
-                    {
-                        Assembler = "TYA";
-                        break;
-                    }
-                case opCodes.LDY_ZP:
-                    {
-                        byte operand = (byte)(mem.Read((byte)(Addr + 1)));
-                        Assembler = string.Format("LDY ${0:X4}", operand);
-                        break;
-                    }
                 case opCodes.CLC:
-                    {
-                        Assembler = "CLC";
-                        break;
-                    }
-                case opCodes.STY_ABS:
-                    {
-                        ushort addr = (ushort)(mem.Read((ushort)(Addr + 1)) + (mem.Read((ushort)(Addr + 2)) << 8));
-                        Assembler = string.Format("STY {0:X4}", addr);
-                        break;
-                    }
-                case opCodes.LDA_ABS_Y:
-                    {
-                        ushort addr = (ushort)(mem.Read((ushort)(Addr + 1)) + (mem.Read((ushort)(Addr + 2)) << 8));
-                        Assembler = string.Format("LDA {0:X4},Y   {1:X4}", addr, addr + Y);
-                        break;
-                    }
-                case opCodes.BCS_REL:
-                    {
-                        sbyte operand = (sbyte)mem.Read((ushort)(Addr + 1));
-                        Assembler = string.Format("BCS ${0:X4}", Addr + operand + 2);
-                        break;
-                    }
                 case opCodes.DEY:
                     {
-                        Assembler = "DEY";
                         break;
                     }
-                case opCodes.BPL:
+
+
+                // ABS
+                case opCodes.JSR:
+                case opCodes.STX_ABS:
+                case opCodes.STA_ABS:
+                case opCodes.LDA_ABS:
+                case opCodes.JMP_ABS:
+                case opCodes.STY_ABS:
                     {
-                        sbyte operand = (sbyte)mem.Read((ushort)(Addr + 1));
-                        Assembler = string.Format("BPL ${0:X4}", Addr + operand + 2);
+                        Assembler += DisassembleOperand(Addr + 1, AddressingMode.ABS);
                         break;
                     }
+
+
+                // ABS,X
+                case opCodes.LDA_ABS_X:
+                case opCodes.CMP_ABS_X:
                 case opCodes.STA_ABS_X:
                     {
-                        ushort addr = (ushort)(mem.Read((ushort)(Addr + 1)) + (mem.Read((ushort)(Addr + 2)) << 8));
-                        Assembler = string.Format("STA ${0:X4},X  {1:X4}", addr, addr + X);
+                        Assembler += DisassembleOperand(Addr + 1, AddressingMode.ABS_X); //string.Format("LDA ${0:X4}+X  ${1:X4}", operand, operand + X);
                         break;
                     }
-                case opCodes.STY_ZP_X:
+
+
+                // REL
+                case opCodes.BNE_REL:
+                case opCodes.BEQ_REL:
+                case opCodes.BPL:
+                case opCodes.BCS_REL:
+                case opCodes.BMI_REL:
                     {
-                        ushort addr = (ushort)(mem.Read((ushort)(Addr + 1)) + X);
-                        ushort lookup = (ushort)(mem.Read(addr) + mem.Read((ushort)(addr + 1)) << 8);
-                        Assembler = string.Format("STY ${0:X2},X  {1:X4}", addr + X, lookup);
+                        Assembler += DisassembleOperand(Addr + 1, AddressingMode.REL);
+                        break;
+                    }
+
+
+                // ZP
+                case opCodes.STA_ZP:
+                case opCodes.STX_ZP:
+                case opCodes.STY_ZP:
+                case opCodes.INC_ZP:
+                case opCodes.LDY_ZP:
+                case opCodes.LDX_ZP:
+                    {
+                        Assembler += DisassembleOperand(Addr + 1, AddressingMode.ZP);
+                        break;
+                    }
+
+
+                // ABS_Y
+                case opCodes.STA_ABS_Y:
+                case opCodes.LDA_ABS_Y:
+                    {
+                        Assembler += DisassembleOperand(Addr + 1, AddressingMode.ABS_Y);
+                        break;
+                    }
+
+
+                // IND_Y
+                case opCodes.LDA_IND_Y:
+                case opCodes.STA_IND_Y:
+                case opCodes.CMP_IND_Y:
+                    {
+                        Assembler += DisassembleOperand(Addr + 1, AddressingMode.IND_Y);
+                        break;
+                    }
+
+
+                // ZP_X
+                case opCodes.STY_ZP_X:
+                case opCodes.LDY_ZP_X:
+                    {
+                        Assembler += DisassembleOperand(Addr + 1, AddressingMode.ZP_X);
+                        break;
+                    }
+                default:
+                    {
+                        Assembler = String.Format("??? {0:X2} {1:X2} {2:X2}", (byte)OpCode, mem.Read((ushort)(Addr + 1)), mem.Read((ushort)(Addr + 2)));
                         break;
                     }
             }
 
             return Assembler;
+        }
 
+        string DisassembleOperand(int Addr, AddressingMode Mode)
+        {
+            switch (Mode)
+            {
+                case AddressingMode.IMM:
+                    {
+                        return string.Format(" #${0:X2}", mem.Read(Addr));
+                    }
+                case AddressingMode.ABS:
+                    {
+                        return string.Format(" ${0:X4}", mem.Read(Addr) + (mem.Read(Addr + 1) << 8));
+                    }
+                case AddressingMode.ABS_X:
+                    {
+                        int addr = mem.Read(Addr) + (mem.Read(Addr + 1) << 8);
+                        return string.Format(" ${0:X4},X   ${1:X4}", addr, addr + X);
+                    }
+                case AddressingMode.ABS_Y:
+                    {
+                        int addr = mem.Read(Addr) + (mem.Read(Addr + 1) << 8);
+                        return string.Format(" ${0:X4},Y   ${1:X4}", addr, addr + Y);
+                    }
+                case AddressingMode.ZP:
+                    {
+                        return string.Format(" ${0:X2}", mem.Read(Addr + 1));
+                    }
+                case AddressingMode.REL:
+                    {
+                        return string.Format(" ${0:X4}", Addr + 1 + (sbyte)mem.Read(Addr));
+                    }
+                case AddressingMode.IND_Y:
+                    {
+                        ushort zpAddress = (ushort)(mem.Read(Addr));
+                        ushort addr = (ushort)(mem.Read(zpAddress) + (mem.Read(zpAddress + 1) << 8));
+                        return string.Format(" ${0:X4},Y   ${1:X4}", addr, addr + Y);
+                    }
+                case AddressingMode.ZP_X:
+                    {
+                        ushort zpAddress = (ushort)(mem.Read(Addr));
+                        return string.Format(" ${0:X2},X   ${1:X2}", zpAddress, ((zpAddress + X) % 0xFF));
+                    }
+                case AddressingMode.ZP_Y:
+                    {
+                        ushort zpAddress = (ushort)(mem.Read(Addr));
+                        return string.Format(" ${0:X2},Y   ${1:X2}", zpAddress, ((zpAddress + Y) % 0xFF));
+                    }
+                default:
+                    return string.Format("{0:X2} {1:X2}", mem.Read(Addr), mem.Read(Addr + 1));
+            }
         }
     }
 }
