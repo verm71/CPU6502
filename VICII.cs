@@ -76,7 +76,7 @@ namespace CPU6502
 
                 case 0xD018:
                     {
-                        VideoMatrixBaseAddress = (byte)(Value & 0xF0 >> 4);
+                        VideoMatrixBaseAddress = (byte)((Value & 0xF0) >> 4);
                         CharacterDotDataBaseAddress = (byte)(Value & 0x0E);
                         break;
                     }
