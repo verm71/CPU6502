@@ -46,6 +46,8 @@ namespace CPU6502
         //ulong Cycles = 0;
         public bool run = false;
         public ushort StopAt = 0;
+        public int StopAtMemoryRead = -1;
+        public int StopAtMemoryWrite = -1;
         public int OpCodePauseNanoseconds = 100000;
 
         public enum AddressingMode

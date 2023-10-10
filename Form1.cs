@@ -17,6 +17,7 @@ namespace CPU6502
             InitializeComponent();
             mem = new RAM();
             cpu = new CPU(mem);
+            mem.cpu = cpu;
             dump = new Label[16, 8];
             addr = new Label[8];
 
@@ -340,6 +341,38 @@ namespace CPU6502
                     cpu.StopAt = 0;
                 }
 
+                if (cbStopOnMemory.Checked)
+                {
+                    string working = txtStopOnMemory.Text;
+                    if (working.StartsWith("0x"))
+                    {
+                        working = working.Substring(2);
+                    }
+
+                    if (rbMemoryWrite.Checked)
+                    {
+                        cpu.StopAtMemoryWrite = ushort.Parse(working, NumberStyles.HexNumber);
+                    }
+                    else
+                    {
+                        cpu.StopAtMemoryWrite = -1;
+                    }
+
+                    if (rbMemoryRead.Checked)
+                    {
+                        cpu.StopAtMemoryRead = ushort.Parse(working, NumberStyles.HexNumber);
+                    }
+                    else
+                    {
+                        cpu.StopAtMemoryRead = -1;
+                    }
+                }
+                else
+                {
+                    cpu.StopAtMemoryRead = -1;
+                    cpu.StopAtMemoryWrite = -1;
+                }
+
                 cpu.run = true;
                 CPUTask = Task.Run(cpu.Run);
                 UpdateTimer.Enabled = true;
@@ -404,6 +437,12 @@ namespace CPU6502
         private void cbStopAt_CheckedChanged(object sender, EventArgs e)
         {
             txtStopAt.Enabled = cbStopAt.Checked;
+        }
+
+        private void cbStopOnMemory_CheckedChanged(object sender, EventArgs e)
+        {
+            txtStopOnMemory.Enabled = cbStopOnMemory.Checked;
+
         }
     }
 }

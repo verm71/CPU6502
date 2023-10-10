@@ -88,8 +88,14 @@
             rbZero = new RadioButton();
             txtStopAt = new TextBox();
             cbStopAt = new CheckBox();
+            groupBox2 = new GroupBox();
+            rbMemoryRead = new RadioButton();
+            rbMemoryWrite = new RadioButton();
+            txtStopOnMemory = new TextBox();
+            cbStopOnMemory = new CheckBox();
             pnlDump.SuspendLayout();
             groupBox1.SuspendLayout();
+            groupBox2.SuspendLayout();
             SuspendLayout();
             // 
             // button1
@@ -120,7 +126,7 @@
             lblSP.AutoSize = true;
             lblSP.BorderStyle = BorderStyle.FixedSingle;
             lblSP.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblSP.Location = new Point(331, 60);
+            lblSP.Location = new Point(327, 128);
             lblSP.Margin = new Padding(2, 0, 2, 0);
             lblSP.Name = "lblSP";
             lblSP.Size = new Size(35, 17);
@@ -130,7 +136,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(246, 60);
+            label3.Location = new Point(242, 128);
             label3.Margin = new Padding(2, 0, 2, 0);
             label3.Name = "label3";
             label3.Size = new Size(73, 15);
@@ -219,7 +225,7 @@
             lblY.AutoSize = true;
             lblY.BorderStyle = BorderStyle.FixedSingle;
             lblY.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblY.Location = new Point(218, 78);
+            lblY.Location = new Point(190, 128);
             lblY.Margin = new Padding(2, 0, 2, 0);
             lblY.Name = "lblY";
             lblY.Size = new Size(37, 17);
@@ -229,7 +235,7 @@
             // label10
             // 
             label10.AutoSize = true;
-            label10.Location = new Point(198, 78);
+            label10.Location = new Point(170, 128);
             label10.Margin = new Padding(2, 0, 2, 0);
             label10.Name = "label10";
             label10.Size = new Size(17, 15);
@@ -241,7 +247,7 @@
             lblX.AutoSize = true;
             lblX.BorderStyle = BorderStyle.FixedSingle;
             lblX.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblX.Location = new Point(139, 78);
+            lblX.Location = new Point(118, 128);
             lblX.Margin = new Padding(2, 0, 2, 0);
             lblX.Name = "lblX";
             lblX.Size = new Size(37, 17);
@@ -251,7 +257,7 @@
             // label12
             // 
             label12.AutoSize = true;
-            label12.Location = new Point(111, 78);
+            label12.Location = new Point(90, 128);
             label12.Margin = new Padding(2, 0, 2, 0);
             label12.Name = "label12";
             label12.Size = new Size(17, 15);
@@ -263,7 +269,7 @@
             lblA.AutoSize = true;
             lblA.BorderStyle = BorderStyle.FixedSingle;
             lblA.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblA.Location = new Point(139, 60);
+            lblA.Location = new Point(42, 128);
             lblA.Margin = new Padding(2, 0, 2, 0);
             lblA.Name = "lblA";
             lblA.Size = new Size(37, 17);
@@ -273,7 +279,7 @@
             // label14
             // 
             label14.AutoSize = true;
-            label14.Location = new Point(111, 60);
+            label14.Location = new Point(14, 128);
             label14.Margin = new Padding(2, 0, 2, 0);
             label14.Name = "label14";
             label14.Size = new Size(24, 15);
@@ -366,7 +372,7 @@
             pnlDump.Controls.Add(lbl02);
             pnlDump.Controls.Add(lbl01);
             pnlDump.Controls.Add(lbl00);
-            pnlDump.Location = new Point(18, 155);
+            pnlDump.Location = new Point(23, 196);
             pnlDump.Name = "pnlDump";
             pnlDump.Size = new Size(484, 245);
             pnlDump.TabIndex = 24;
@@ -632,7 +638,7 @@
             groupBox1.Controls.Add(rb100K);
             groupBox1.Controls.Add(rb10K);
             groupBox1.Controls.Add(rbZero);
-            groupBox1.Location = new Point(6, 102);
+            groupBox1.Location = new Point(6, 150);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(325, 44);
             groupBox1.TabIndex = 32;
@@ -715,11 +721,67 @@
             cbStopAt.UseVisualStyleBackColor = true;
             cbStopAt.CheckedChanged += cbStopAt_CheckedChanged;
             // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(rbMemoryRead);
+            groupBox2.Controls.Add(rbMemoryWrite);
+            groupBox2.Controls.Add(txtStopOnMemory);
+            groupBox2.Controls.Add(cbStopOnMemory);
+            groupBox2.Location = new Point(112, 62);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(284, 63);
+            groupBox2.TabIndex = 37;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Stop on memory accesss";
+            // 
+            // rbMemoryRead
+            // 
+            rbMemoryRead.AutoSize = true;
+            rbMemoryRead.Location = new Point(161, 38);
+            rbMemoryRead.Name = "rbMemoryRead";
+            rbMemoryRead.Size = new Size(59, 19);
+            rbMemoryRead.TabIndex = 40;
+            rbMemoryRead.Text = "is read";
+            rbMemoryRead.UseVisualStyleBackColor = true;
+            // 
+            // rbMemoryWrite
+            // 
+            rbMemoryWrite.AutoSize = true;
+            rbMemoryWrite.Checked = true;
+            rbMemoryWrite.Location = new Point(161, 15);
+            rbMemoryWrite.Name = "rbMemoryWrite";
+            rbMemoryWrite.Size = new Size(73, 19);
+            rbMemoryWrite.TabIndex = 39;
+            rbMemoryWrite.TabStop = true;
+            rbMemoryWrite.Text = "is written";
+            rbMemoryWrite.UseVisualStyleBackColor = true;
+            // 
+            // txtStopOnMemory
+            // 
+            txtStopOnMemory.Enabled = false;
+            txtStopOnMemory.Location = new Point(86, 14);
+            txtStopOnMemory.Margin = new Padding(2, 1, 2, 1);
+            txtStopOnMemory.Name = "txtStopOnMemory";
+            txtStopOnMemory.Size = new Size(70, 23);
+            txtStopOnMemory.TabIndex = 38;
+            // 
+            // cbStopOnMemory
+            // 
+            cbStopOnMemory.AutoSize = true;
+            cbStopOnMemory.Location = new Point(6, 16);
+            cbStopOnMemory.Name = "cbStopOnMemory";
+            cbStopOnMemory.Size = new Size(82, 19);
+            cbStopOnMemory.TabIndex = 0;
+            cbStopOnMemory.Text = "Stop when";
+            cbStopOnMemory.UseVisualStyleBackColor = true;
+            cbStopOnMemory.CheckedChanged += cbStopOnMemory_CheckedChanged;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(762, 408);
+            ClientSize = new Size(762, 453);
+            Controls.Add(groupBox2);
             Controls.Add(cbStopAt);
             Controls.Add(txtStopAt);
             Controls.Add(groupBox1);
@@ -763,6 +825,8 @@
             pnlDump.PerformLayout();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -828,5 +892,10 @@
         private RadioButton rb1M;
         private TextBox txtStopAt;
         private CheckBox cbStopAt;
+        private GroupBox groupBox2;
+        private RadioButton rbMemoryRead;
+        private RadioButton rbMemoryWrite;
+        private TextBox txtStopOnMemory;
+        private CheckBox cbStopOnMemory;
     }
 }

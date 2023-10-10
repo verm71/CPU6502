@@ -71,6 +71,7 @@ namespace CPU6502
         private CIA1 cia1;
         private CIA2 cia2;
         private VICII vic;
+        public CPU cpu;
 
         public RAM()
         {
@@ -91,6 +92,11 @@ namespace CPU6502
 
         public void Write(ushort addr, byte value)
         {
+            if (cpu !=null && addr == cpu.StopAtMemoryWrite)
+            {
+                cpu.run = false;
+            }
+
             if (addr == 1)
             {
                 for (int i = 0; i < 7; i++)
@@ -149,6 +155,11 @@ namespace CPU6502
 
         public byte Read(int addr)
         {
+            if (cpu != null && addr==cpu.StopAtMemoryRead)
+            {
+                cpu.run = false;
+            }
+
             if (addr >= 0xE000)
             {
                 switch (MapMode[6])
