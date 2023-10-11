@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
+using System.Net;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
@@ -75,8 +76,11 @@ namespace CPU6502
             AND_IMM = 0x29,
             ROL = 0x2A,
             BMI_REL = 0x30,
+            SEC = 0x38,
             JMP_ABS = 0x4C,
+            CLI = 0x58,
             RTS = 0x60,
+            JMP_IND = 0x6C,
             ADC_IMM = 0x69,
             SEI = 0x78,
             STY_ZP = 0x84,
@@ -209,6 +213,11 @@ namespace CPU6502
                 case AddressingMode.ZP_Y:
                     {
                         return (ushort)((mem.Read(addr++) + Y) & 0xFF);
+                    }
+                case AddressingMode.IND:
+                    {
+                        ushort Interim = (ushort)(mem.Read(addr++) + (mem.Read(addr++) << 8));
+                        return (ushort)(mem.Read(Interim) + (mem.Read(Interim + 1) << 8));
                     }
                 default:
                     {
@@ -626,6 +635,21 @@ namespace CPU6502
                         }
                         break;
                     }
+                case opCodes.CLI:
+                    {
+                        F.I = false;
+                        break;
+                    }
+                case opCodes.JMP_IND:
+                    {
+                        PC = FetchAddress(ref PC, AddressingMode.IND);
+                        break;
+                    }
+                case opCodes.SEC:
+                    {
+                        F.C = true;
+                        break;
+                    }
                 default:
                     {
                         Debug.WriteLine(String.Format("**** {1:X4}: OP Code {0:X2} not implemented.", (byte)OpCode, LastFetchAddr));
@@ -679,6 +703,7 @@ namespace CPU6502
                 case opCodes.TYA:
                 case opCodes.CLC:
                 case opCodes.DEY:
+                case opCodes.CLI:
                     {
                         break;
                     }
@@ -757,8 +782,17 @@ namespace CPU6502
                 case opCodes.STY_ZP_X:
                 case opCodes.LDY_ZP_X:
                 case opCodes.LDA_ZP_X:
+                case opCodes.STA_ZP_X:
                     {
                         Assembler += DisassembleOperand(Addr + 1, AddressingMode.ZP_X);
+                        break;
+                    }
+
+
+                // IND
+                case opCodes.JMP_IND:
+                    {
+                        Assembler += DisassembleOperand(Addr + 1, AddressingMode.IND);
                         break;
                     }
                 default:
@@ -816,6 +850,11 @@ namespace CPU6502
                     {
                         ushort zpAddress = (ushort)(mem.Read(Addr));
                         return string.Format(" ${0:X2},Y   ${1:X2}", zpAddress, ((zpAddress + Y) % 0xFF));
+                    }
+                case AddressingMode.IND:
+                    {
+                        ushort interim = (ushort)(mem.Read(Addr) + (mem.Read(Addr + 1) << 8));
+                        return string.Format(" $({0:X4})    ${1:X4}", interim, (mem.Read(interim) + (mem.Read(interim + 1) << 8)));
                     }
                 default:
                     return string.Format("{0:X2} {1:X2}", mem.Read(Addr), mem.Read(Addr + 1));

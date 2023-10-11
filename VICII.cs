@@ -14,7 +14,7 @@ namespace CPU6502
         CIA2 cia2;
         RAM mem;
         Display display;
-        byte CurrentRaster;
+        int CurrentRaster;
         public byte bank;
         int FramePauseNanoseconds = 10000;
         Color[] palette = { Color.Black, Color.White, Color.Red, Color.Cyan, Color.Purple, Color.Green, Color.Blue, Color.Yellow, Color.Orange, Color.Brown, Color.Pink, Color.Gray, Color.DarkGray, Color.LightGreen, Color.LightBlue, Color.LightGray };
@@ -120,6 +120,9 @@ namespace CPU6502
 
                 CurrentRaster++;
                 CurrentRaster = (byte)(CurrentRaster % 200);
+                mem._mem[0xd012] = (byte)(CurrentRaster & 0xFF);
+                mem._mem[0xd011] = (byte)(((CurrentRaster & 0x100) >> 1) | (mem._mem[0xd011] & 0x7F)); 
+                
 
                 if (CurrentRaster == 0)
                 {
