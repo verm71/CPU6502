@@ -14,26 +14,34 @@ namespace CPU6502
         CIA2 cia2;
         RAM mem;
         Display display;
+        public bool UpdateDisplay = false;
         int CurrentRaster;
         public byte bank;
         int FramePauseNanoseconds = 10000;
         Color[] palette = { Color.Black, Color.White, Color.Red, Color.Cyan, Color.Purple, Color.Green, Color.Blue, Color.Yellow, Color.Orange, Color.Brown, Color.Pink, Color.Gray, Color.DarkGray, Color.LightGreen, Color.LightBlue, Color.LightGray };
 
-        public ushort _BaseMemory
+         ushort _BaseMemory
         {
             get
             {
-                return (ushort)((3-bank) * 0x4000);
+                return (ushort)(bank * 0x4000);
             }
         }
-        public ushort _VideoMatrixAddress
+         ushort _VideoMatrixAddressInternal
         {
             get
             {
-                return (ushort)(VideoMatrixBaseAddress * 64 + _BaseMemory);
+                return (ushort)(VideoMatrixBaseAddress * 64);
             }
         }
 
+         ushort _CharacterMemoryInternal
+        {
+            get
+            {
+                return (ushort)(CharacterDotDataBaseAddress * 1024);
+            }
+        }
 
         // Control Register 1
         bool BlankScreenToBorderColor;
@@ -50,13 +58,13 @@ namespace CPU6502
 
         public VICII(ref CIA1 Cia1, ref CIA2 Cia2, RAM Ram)
         {
-            Cia1 = cia1 = new CIA1(this,Ram);
-            Cia2 = cia2 = new CIA2(this,Ram);
+            Cia1 = cia1 = new CIA1(this, Ram);
+            Cia2 = cia2 = new CIA2(this, Ram);
 
             mem = Ram;
             display = new Display();
             display.Show();
-            Task.Run(UpdateDisplay);
+            Task.Run(DisplayRefresh);
         }
 
         public void Write(ushort Addr, byte Value)
@@ -76,7 +84,7 @@ namespace CPU6502
 
                 case 0xD018:
                     {
-                        VideoMatrixBaseAddress = (byte)(Value & 0xF0) ;
+                        VideoMatrixBaseAddress = (byte)(Value & 0xF0);
                         CharacterDotDataBaseAddress = (byte)(Value & 0x0E);
                         break;
                     }
@@ -89,50 +97,79 @@ namespace CPU6502
             }
         }
 
-        void UpdateDisplay()
+        byte ReadVic(int IntAddr)   // using internal Vic maping
+        {
+            switch (bank)
+            {
+                case 0:
+                case 2:
+                    {
+                        if (IntAddr < 0x200)   // color RAM?
+                        {
+                            return (byte)(mem._mem[0xd800 + IntAddr] & 0x0F);
+                        }
+                        if (IntAddr < 0x1000) // regular ram
+                        {
+                            return mem._mem[IntAddr + _BaseMemory];
+                        }
+                        if (IntAddr < 0x2000) // char rom
+                        {
+                            return mem.CHARROM[IntAddr - 0x1000];
+                        }
+                        return mem._mem[IntAddr + _BaseMemory];
+                    }
+            }
+
+            return mem._mem[IntAddr + _BaseMemory];
+        }
+
+        void DisplayRefresh()
         {
             SolidBrush background = new(Color.Black);
             Bitmap scr = new(320, 200);
             Rectangle scale = new(0, 0, 1000, 800);
-            
+
             while (!display.IsDisposed)
             {
-                int videoAddress = _VideoMatrixAddress;
-
-                for (int c = 0; c < 40; c++)
+                if (UpdateDisplay)
                 {
-                    byte ch = mem._mem[(CurrentRaster / 8) * 40 + c + videoAddress];
+                    int videoAddress = _VideoMatrixAddressInternal;
 
-                    byte bm = mem.CHARROM[ch * 8 + CurrentRaster % 8];
-                    for (int b = 7; b >= 0; b--)
+                    for (int c = 0; c < 40; c++)
                     {
-                        if ((bm & 0x01) != 0)
+                        byte ch = ReadVic(_VideoMatrixAddressInternal + (CurrentRaster / 8) * 40 + c);
+
+                        byte bm = ReadVic(_CharacterMemoryInternal + ch * 8 + CurrentRaster % 8);
+                        for (int b = 7; b >= 0; b--)
                         {
-                            scr.SetPixel(c * 8 + b, CurrentRaster, palette[mem._mem[(CurrentRaster / 8) * 40 + c + 0xD800]]);
+                            if ((bm & 0x01) != 0)
+                            {
+                                scr.SetPixel(c * 8 + b, CurrentRaster, palette[mem._mem[(CurrentRaster / 8) * 40 + c + 0xD800]]);
+                            }
+                            else
+                            {
+                                scr.SetPixel(c * 8 + b, CurrentRaster, palette[mem._mem[0xD021] & 0x0F]);
+                            }
+                            bm >>= 1;
                         }
-                        else
-                        {
-                            scr.SetPixel(c * 8 + b, CurrentRaster, palette[mem._mem[0xD021] & 0x0F]);
-                        }
-                        bm >>= 1;
                     }
-                }
 
-                CurrentRaster++;
-                CurrentRaster = (byte)(CurrentRaster % 200);
-                mem._mem[0xd012] = (byte)(CurrentRaster & 0xFF);
-                mem._mem[0xd011] = (byte)(((CurrentRaster & 0x100) >> 1) | (mem._mem[0xd011] & 0x7F)); 
-                
+                    CurrentRaster++;
+                    CurrentRaster = (byte)(CurrentRaster % 200);
+                    mem._mem[0xd012] = (byte)(CurrentRaster & 0xFF);
+                    mem._mem[0xd011] = (byte)(((CurrentRaster & 0x100) >> 1) | (mem._mem[0xd011] & 0x7F));
 
-                if (CurrentRaster == 0)
-                {
-                    display.graphics.DrawImage(scr, scale);
-                }
 
-                DateTime end = DateTime.Now + new TimeSpan(FramePauseNanoseconds / 100);
-                while (DateTime.Now < end)
-                {
-                    Thread.Yield();
+                    if (CurrentRaster == 0)
+                    {
+                        display.graphics.DrawImage(scr, scale);
+                    }
+
+                    DateTime end = DateTime.Now + new TimeSpan(FramePauseNanoseconds / 100);
+                    while (DateTime.Now < end)
+                    {
+                        Thread.Yield();
+                    }
                 }
             }
 
