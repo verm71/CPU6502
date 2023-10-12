@@ -23,7 +23,7 @@ namespace CPU6502
         {
             get
             {
-                return (ushort)((3-bank) * 0x4000);
+                return (ushort)((3 - bank) * 0x4000);
             }
         }
         public ushort _VideoMatrixAddress
@@ -38,7 +38,7 @@ namespace CPU6502
         {
             get
             {
-                return (ushort)( CharacterDotDataBaseAddress * 1024 + _BaseMemory);
+                return (ushort)(CharacterDotDataBaseAddress * 1024 + _BaseMemory);
             }
         }
 
@@ -57,14 +57,15 @@ namespace CPU6502
 
         public VICII(ref CIA1 Cia1, ref CIA2 Cia2, RAM Ram)
         {
-            Cia1 = cia1 = new CIA1(this,Ram);
-            Cia2 = cia2 = new CIA2(this,Ram);
+            Cia1 = cia1 = new CIA1(this, Ram);
+            Cia2 = cia2 = new CIA2(this, Ram);
 
             mem = Ram;
             display = new Display();
             display.Show();
             Task.Run(UpdateDisplay);
         }
+
 
         public void Write(ushort Addr, byte Value)
         {
@@ -83,7 +84,7 @@ namespace CPU6502
 
                 case 0xD018:
                     {
-                        VideoMatrixBaseAddress = (byte)(Value & 0xF0) ;
+                        VideoMatrixBaseAddress = (byte)(Value & 0xF0);
                         CharacterDotDataBaseAddress = (byte)(Value & 0x0E);
                         break;
                     }
@@ -96,12 +97,26 @@ namespace CPU6502
             }
         }
 
+        public byte VicRead(ushort Addr)   // using internal Vic maping
+        {
+            // Convert address to vic's internal 16K window
+            Addr -= _BaseMemory;
+
+
+            if (bank == 0 && bank == 2)
+            {
+                if (Addr == _CharacterMemory)
+                    return mem.CHARROM[Addr - _CharacterMemory];
+            }
+            return mem._mem[Addr];
+        }
+
         void UpdateDisplay()
         {
             SolidBrush background = new(Color.Black);
             Bitmap scr = new(320, 200);
             Rectangle scale = new(0, 0, 1000, 800);
-            
+
             while (!display.IsDisposed)
             {
                 int videoAddress = _VideoMatrixAddress;
@@ -110,7 +125,7 @@ namespace CPU6502
                 {
                     byte ch = mem._mem[(CurrentRaster / 8) * 40 + c + videoAddress];
 
-                    byte bm = mem.CHARROM[_CharacterMemory-0x1000 + ch * 8 + CurrentRaster % 8];
+                    byte bm = mem.CHARROM[_CharacterMemory - 0x1000 + ch * 8 + CurrentRaster % 8];
                     for (int b = 7; b >= 0; b--)
                     {
                         if ((bm & 0x01) != 0)
@@ -128,8 +143,8 @@ namespace CPU6502
                 CurrentRaster++;
                 CurrentRaster = (byte)(CurrentRaster % 200);
                 mem._mem[0xd012] = (byte)(CurrentRaster & 0xFF);
-                mem._mem[0xd011] = (byte)(((CurrentRaster & 0x100) >> 1) | (mem._mem[0xd011] & 0x7F)); 
-                
+                mem._mem[0xd011] = (byte)(((CurrentRaster & 0x100) >> 1) | (mem._mem[0xd011] & 0x7F));
+
 
                 if (CurrentRaster == 0)
                 {

@@ -210,7 +210,7 @@ namespace CPU6502
                         }
                     case Mapping.IO:
                         {
-                            return _mem[addr];    // not implemented
+                            return _mem[addr];    
                         }
                 }
             }
