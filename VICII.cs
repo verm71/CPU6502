@@ -34,6 +34,13 @@ namespace CPU6502
             }
         }
 
+        public ushort _CharacterMemory
+        {
+            get
+            {
+                return (ushort)( CharacterDotDataBaseAddress * 1024 + _BaseMemory);
+            }
+        }
 
         // Control Register 1
         bool BlankScreenToBorderColor;
@@ -103,7 +110,7 @@ namespace CPU6502
                 {
                     byte ch = mem._mem[(CurrentRaster / 8) * 40 + c + videoAddress];
 
-                    byte bm = mem.CHARROM[ch * 8 + CurrentRaster % 8];
+                    byte bm = mem.CHARROM[_CharacterMemory-0x1000 + ch * 8 + CurrentRaster % 8];
                     for (int b = 7; b >= 0; b--)
                     {
                         if ((bm & 0x01) != 0)
