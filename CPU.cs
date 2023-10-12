@@ -72,15 +72,20 @@ namespace CPU6502
             ORA_IMM = 0x09,
             ORA_ABS = 0x0D,
             BPL = 0x10,
+            ASL_ZP_X = 0x16,
             CLC = 0x18,
             JSR = 0x20,
+            BIT_ZP=0x24,
             PLP = 0x28,
             AND_IMM = 0x29,
             ROL = 0x2A,
             BMI_REL = 0x30,
             SEC = 0x38,
+            LSR_ZP = 0x46,
             PHA = 0x48,
+            EOR_IMM = 0x49,
             JMP_ABS = 0x4C,
+            LSR_ZP_X = 0x56,
             CLI = 0x58,
             RTS = 0x60,
             ADC_ZP = 0x65,
@@ -133,11 +138,18 @@ namespace CPU6502
             CLD = 0xD8,
             CMP_ABS_X = 0xDD,
             CPX_IMM = 0xE0,
+            SBC_IND_X=0xE1,
+            SBC_ZP = 0xE5,
             INC_ZP = 0xE6,
             INX = 0xE8,
             SBC_IMM = 0xE9,
+            SBC_ABS = 0xED,
             INC_ABS = 0xEE,
-            BEQ_REL = 0xF0
+            BEQ_REL = 0xF0,
+            SBC_IND_Y=0xF1,
+            SBC_ZP_X = 0xF5,
+            SBC_ABS_Y=0xF9,
+            SBC_ABS_X = 0xFD
         }
 
         public CPU(RAM m)
@@ -222,7 +234,7 @@ namespace CPU6502
                     }
                 case AddressingMode.ZP_X:
                     {
-                        return (ushort)((mem.Read(addr++) + X) % 0xFF);
+                        return (ushort)((mem.Read(addr++) + X) & 0xFF);
                     }
                 case AddressingMode.ZP_Y:
                     {
@@ -775,6 +787,117 @@ namespace CPU6502
                         F.N = (value & 0x80) != 0;
                         break;
                     }
+                case opCodes.ASL_ZP_X:
+                    {
+                        ushort addr = FetchAddress(ref PC, AddressingMode.ZP_X);
+                        int value = mem.Read(addr) << 1;
+                        F.C = (value & 0x100) != 0;
+                        F.Z = (value & 0xFF) == 0;
+                        F.N = (value & 0x80) != 0;
+                        mem.Write(addr, (byte)value);
+                        break;
+                    }
+                case opCodes.LSR_ZP_X:
+                    {
+                        ushort addr = FetchAddress(ref PC, AddressingMode.ZP_X);
+                        int value = mem.Read(addr);
+                        F.C = (value & 0x01) != 0;
+                        F.Z = (value & 0xFE) == 0;
+                        F.N = false;
+                        mem.Write(addr, (byte)(value >> 1));
+                        break;
+                    }
+                case opCodes.LSR_ZP:
+                    {
+                        ushort addr = FetchAddress(ref PC, AddressingMode.ZP);
+                        int value = mem.Read(addr);
+                        F.C = (value & 0x01) != 0;
+                        F.Z = (value & 0xFE) == 0;
+                        F.N = false;
+                        mem.Write(addr, (byte)(value >> 1));
+                        break;
+                    }
+                case opCodes.EOR_IMM:
+                    {
+                        A ^= FetchValue(ref PC, AddressingMode.IMM);
+                        F.Z = (A == 0);
+                        F.N = (A & 0x80) != 0;
+                        break;
+                    }
+                case opCodes.SBC_ZP:
+                    {
+                        int result = A - FetchValue(ref PC, AddressingMode.ZP) - (!F.C ? 1 : 0);
+                        F.C = (result > 0xFF);
+                        F.O = (result < -128 || result > 127);
+                        F.Z = (result == 0);
+                        F.N = (result & 0x80) != 0;
+                        A = (byte)result;
+                        break;
+                    }
+                case opCodes.SBC_ZP_X:
+                    {
+                        int result = A - FetchValue(ref PC, AddressingMode.ZP_X) - (!F.C ? 1 : 0);
+                        F.C = (result > 0xFF);
+                        F.O = (result < -128 || result > 127);
+                        F.Z = (result == 0);
+                        F.N = (result & 0x80) != 0;
+                        A = (byte)result;
+                        break;
+                    }
+                case opCodes.SBC_ABS:
+                    {
+                        int result = A - FetchValue(ref PC, AddressingMode.ABS) - (!F.C ? 1 : 0);
+                        F.C = (result > 0xFF);
+                        F.O = (result < -128 || result > 127);
+                        F.Z = (result == 0);
+                        F.N = (result & 0x80) != 0;
+                        A = (byte)result;
+                        break;
+                    }
+                case opCodes.SBC_ABS_X:
+                    {
+                        int result = A - FetchValue(ref PC, AddressingMode.ABS_X) - (!F.C ? 1 : 0);
+                        F.C = (result > 0xFF);
+                        F.O = (result < -128 || result > 127);
+                        F.Z = (result == 0);
+                        F.N = (result & 0x80) != 0;
+                        A = (byte)result;
+                        break;
+                    }
+                case opCodes.SBC_ABS_Y:
+                    {
+                        int result = A - FetchValue(ref PC, AddressingMode.ABS_Y) - (!F.C ? 1 : 0);
+                        F.C = (result > 0xFF);
+                        F.O = (result < -128 || result > 127);
+                        F.Z = (result == 0);
+                        F.N = (result & 0x80) != 0;
+                        A = (byte)result;
+                        break;
+                    }
+                case opCodes.SBC_IND_X:
+                    {
+                        int result = A - FetchValue(ref PC, AddressingMode.X_IND) - (!F.C ? 1 : 0);
+                        F.C = (result > 0xFF);
+                        F.O = (result < -128 || result > 127);
+                        F.Z = (result == 0);
+                        F.N = (result & 0x80) != 0;
+                        A = (byte)result;
+                        break;
+                    }
+                case opCodes.SBC_IND_Y:
+                    {
+                        int result = A - FetchValue(ref PC, AddressingMode.IND_Y) - (!F.C ? 1 : 0);
+                        F.C = (result > 0xFF);
+                        F.O = (result < -128 || result > 127);
+                        F.Z = (result == 0);
+                        F.N = (result & 0x80) != 0;
+                        A = (byte)result;
+                        break;
+                    }
+                case opCodes.BIT_ZP:
+                    {
+
+                    }
                 default:
                     {
                         Debug.WriteLine(String.Format("**** {1:X4}: OP Code {0:X2} not implemented.", (byte)OpCode, LastFetchAddr));
@@ -789,15 +912,11 @@ namespace CPU6502
         public string Disassemble(int Addr)
         {
             opCodes OpCode = (opCodes)mem.Read(Addr);
-            string Assembler;
+            string Assembler = "";
 
-            try // might throw if opcode not supported
+            if (OpCode.ToString().Length >= 3) // might throw if opcode not supported
             {
                 Assembler = OpCode.ToString().Substring(0, 3);
-            }
-            catch
-            {
-                Assembler = "";
             }
 
             switch (OpCode)
@@ -810,6 +929,9 @@ namespace CPU6502
                 case opCodes.LDY_IMM:
                 case opCodes.CMP_IMM:
                 case opCodes.SBC_IMM:
+                case opCodes.CPX_IMM:
+                case opCodes.ADC_IMM:
+                case opCodes.EOR_IMM:
                     {
                         Assembler += DisassembleOperand(Addr + 1, AddressingMode.IMM);
                         break;
@@ -853,6 +975,7 @@ namespace CPU6502
                 case opCodes.LDY_ABS:
                 case opCodes.DEC_ABS:
                 case opCodes.INC_ABS:
+                case opCodes.SBC_ABS:
                     {
                         Assembler += DisassembleOperand(Addr + 1, AddressingMode.ABS);
                         break;
@@ -863,8 +986,19 @@ namespace CPU6502
                 case opCodes.LDA_ABS_X:
                 case opCodes.CMP_ABS_X:
                 case opCodes.STA_ABS_X:
+                case opCodes.SBC_ABS_X:
                     {
                         Assembler += DisassembleOperand(Addr + 1, AddressingMode.ABS_X); //string.Format("LDA ${0:X4}+X  ${1:X4}", operand, operand + X);
+                        break;
+                    }
+
+
+                // ABS_Y
+                case opCodes.STA_ABS_Y:
+                case opCodes.LDA_ABS_Y:
+                case opCodes.SBC_ABS_Y:
+                    {
+                        Assembler += DisassembleOperand(Addr + 1, AddressingMode.ABS_Y);
                         break;
                     }
 
@@ -894,17 +1028,25 @@ namespace CPU6502
                 case opCodes.CMP_ZP:
                 case opCodes.ADC_ZP:
                 case opCodes.DEC_ZP:
+                case opCodes.LSR_ZP:
+                case opCodes.SBC_ZP:
+                case opCodes.BIT_ZP:
                     {
                         Assembler += DisassembleOperand(Addr + 1, AddressingMode.ZP);
                         break;
                     }
 
 
-                // ABS_Y
-                case opCodes.STA_ABS_Y:
-                case opCodes.LDA_ABS_Y:
+                // ZP_X
+                case opCodes.STY_ZP_X:
+                case opCodes.LDY_ZP_X:
+                case opCodes.LDA_ZP_X:
+                case opCodes.STA_ZP_X:
+                case opCodes.ASL_ZP_X:
+                case opCodes.LSR_ZP_X:
+                case opCodes.SBC_ZP_X:
                     {
-                        Assembler += DisassembleOperand(Addr + 1, AddressingMode.ABS_Y);
+                        Assembler += DisassembleOperand(Addr + 1, AddressingMode.ZP_X);
                         break;
                     }
 
@@ -913,19 +1055,10 @@ namespace CPU6502
                 case opCodes.LDA_IND_Y:
                 case opCodes.STA_IND_Y:
                 case opCodes.CMP_IND_Y:
+                case opCodes.SBC_IND_Y:
                     {
                         Assembler += DisassembleOperand(Addr + 1, AddressingMode.IND_Y);
 
-                        break;
-                    }
-
-                // ZP_X
-                case opCodes.STY_ZP_X:
-                case opCodes.LDY_ZP_X:
-                case opCodes.LDA_ZP_X:
-                case opCodes.STA_ZP_X:
-                    {
-                        Assembler += DisassembleOperand(Addr + 1, AddressingMode.ZP_X);
                         break;
                     }
 
@@ -985,12 +1118,12 @@ namespace CPU6502
                 case AddressingMode.ZP_X:
                     {
                         ushort zpAddress = (ushort)(mem.Read(Addr));
-                        return string.Format(" ${0:X2},X   ${1:X2}", zpAddress, ((zpAddress + X) % 0xFF));
+                        return string.Format(" ${0:X2},X   ${1:X2}", zpAddress, ((zpAddress + X) & 0xFF));
                     }
                 case AddressingMode.ZP_Y:
                     {
                         ushort zpAddress = (ushort)(mem.Read(Addr));
-                        return string.Format(" ${0:X2},Y   ${1:X2}", zpAddress, ((zpAddress + Y) % 0xFF));
+                        return string.Format(" ${0:X2},Y   ${1:X2}", zpAddress, ((zpAddress + Y) & 0xFF));
                     }
                 case AddressingMode.IND:
                     {
