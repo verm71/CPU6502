@@ -50,7 +50,7 @@ namespace CPU6502
                         SerialBusATNOut = (Value & 0x08) != 0;
                         RS232Out = (Value & 0x04) != 0;
                         VICBankSelect = (byte)(Value & 0x03);
-                        vic.bank = VICBankSelect;
+                        vic.bank = (byte)(3-VICBankSelect);
                         break;
                     }
 

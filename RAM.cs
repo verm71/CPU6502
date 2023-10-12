@@ -91,7 +91,7 @@ namespace CPU6502
 
         private CIA1 cia1;
         private CIA2 cia2;
-        private VICII vic;
+        public VICII vic;
         public CPU cpu;
 
         public RAM()

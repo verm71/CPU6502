@@ -210,7 +210,7 @@ namespace CPU6502
                 cpu.FetchOpCode();
                 cpu.Execute();
             }
-
+            mem.vic.UpdateDisplay = true;
             UpdateStatusDisplay();
         }
 
@@ -380,6 +380,7 @@ namespace CPU6502
                     cpu.StopAtMemoryWrite = -1;
                 }
 
+                mem.vic.UpdateDisplay = true;
                 cpu.run = true;
                 CPUTask = Task.Run(cpu.Run);
                 UpdateTimer.Enabled = true;
