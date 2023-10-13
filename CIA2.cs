@@ -67,6 +67,9 @@ namespace CPU6502
                 default:
                     {
                         Debug.WriteLine("Unhandled write to CIA2 at {0:X4} value {1:X2}", Addr, Value);
+
+                        // Do some random stuff for moving things along
+                        mem.Write(0xDD00,(byte)(mem.Read(0xDD00) | 0x80)); // simulate serial data in
                         break;
                     }
             }
